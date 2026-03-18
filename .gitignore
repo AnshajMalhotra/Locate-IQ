@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.env
+.env.*
+backups/
+.nocodb-migrations.json
+.DS_Store
+Thumbs.db
+*.log
+.vite/
+.idea/
+.vscode/
