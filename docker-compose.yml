@@ -1,0 +1,12 @@
+services:
+  locate-iq:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VITE_NOCODB_BASE_URL: ${VITE_NOCODB_BASE_URL}
+        VITE_NOCODB_API_KEY: ${VITE_NOCODB_API_KEY}
+    container_name: locate-iq
+    ports:
+      - "${LOCATEIQ_PORT:-8081}:80"
+    restart: unless-stopped
