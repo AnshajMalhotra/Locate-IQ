@@ -34,6 +34,7 @@ function createPanelEmptyDraft(): DeviceSavePayload {
     datasheetPath: '',
     specs: {
       bluetoothVersion: '',
+      sensors: '',
       ipRating: '',
       backhaulType: '',
       powerSupply: '',
@@ -87,6 +88,7 @@ function buildDraft(device: Device, protocolOptions: DeviceOption[], connectivit
     datasheetPath: device.datasheetPath ?? device.documents[0]?.path ?? '',
     specs: {
       bluetoothVersion: device.specs.bluetoothVersion ?? '',
+      sensors: device.specs.sensors?.join('\n') ?? '',
       ipRating: device.specs.ipRating ?? '',
       backhaulType: device.specs.backhaulType ?? '',
       powerSupply: device.specs.powerSupply ?? '',
@@ -133,6 +135,82 @@ function Field({ label, value, onChange, rows = 1 }: { label: string; value: str
         <input value={value} onChange={(event) => onChange(event.target.value)} className={inputClass} />
       )}
     </label>
+  );
+}
+
+function formatVariantCell(values: string[]) {
+  if (!values.length) return 'Not mapped';
+  return values.join('\n');
+}
+
+function DeviceVariantComparison({ device }: { device: Device }) {
+  if (!device.variants?.length) return null;
+
+  const rows = [
+    {
+      label: 'Work Mode',
+      values: device.variants.map((variant) => formatVariantCell(variant.workModes)),
+    },
+    {
+      label: 'BLE Firmware',
+      values: device.variants.map((variant) => formatVariantCell(variant.firmwareSummary)),
+    },
+    {
+      label: 'Sensors',
+      values: device.variants.map((variant) => formatVariantCell(variant.sensors)),
+    },
+    {
+      label: 'Other',
+      values: device.variants.map((variant) => formatVariantCell(variant.notes)),
+    },
+  ];
+
+  return (
+    <section className="mt-6 rounded-[28px] border border-slate-200 bg-slate-50/80 p-4">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h4 className="text-sm font-semibold text-slate-950">Variant Comparison</h4>
+          <p className="mt-1 text-sm text-slate-600">
+            {device.variantGroup ?? `${device.modelNumber ?? device.title} variants`} across work mode, firmware, sensors, and notes.
+          </p>
+        </div>
+        <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-600">
+          {device.variants.length} variants
+        </span>
+      </div>
+
+      <div className="mt-4 overflow-x-auto">
+        <table className="min-w-full border-separate border-spacing-0 overflow-hidden rounded-2xl border border-slate-200 bg-white text-sm text-slate-700">
+          <thead className="bg-slate-100 text-slate-900">
+            <tr>
+              <th className="border-b border-slate-200 px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                Attribute
+              </th>
+              {device.variants.map((variant) => (
+                <th key={variant.id} className="border-b border-l border-slate-200 px-4 py-3 text-left align-top">
+                  <p className="font-semibold text-slate-950">{variant.label}</p>
+                  {variant.chipset ? <p className="mt-1 text-xs font-medium uppercase tracking-[0.12em] text-slate-500">{variant.chipset}</p> : null}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row, rowIndex) => (
+              <tr key={row.label} className={rowIndex % 2 === 1 ? 'bg-slate-50/70' : 'bg-white'}>
+                <th className="border-b border-slate-200 px-4 py-3 text-left align-top text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                  {row.label}
+                </th>
+                {row.values.map((value, columnIndex) => (
+                  <td key={`${row.label}-${device.variants?.[columnIndex]?.id ?? columnIndex}`} className="whitespace-pre-line border-b border-l border-slate-200 px-4 py-3 align-top">
+                    {value}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
   );
 }
 
@@ -255,6 +333,7 @@ function DeviceDetailPanel({
 
           <div className="grid gap-3 sm:grid-cols-2">
             <Field label="Bluetooth Version" value={activeDraft.specs.bluetoothVersion} onChange={(value) => updateSpecs('bluetoothVersion', value)} />
+            <Field label="Sensors" value={activeDraft.specs.sensors} onChange={(value) => updateSpecs('sensors', value)} rows={3} />
             <Field label="IP Rating" value={activeDraft.specs.ipRating} onChange={(value) => updateSpecs('ipRating', value)} />
             <Field label="Backhaul Type" value={activeDraft.specs.backhaulType} onChange={(value) => updateSpecs('backhaulType', value)} />
             <Field label="Power Supply" value={activeDraft.specs.powerSupply} onChange={(value) => updateSpecs('powerSupply', value)} />
@@ -341,8 +420,10 @@ function DeviceDetailPanel({
           <div className="mt-6 grid gap-3 sm:grid-cols-2">
             <div className="rounded-2xl bg-slate-50 p-4"><p className="text-xs uppercase tracking-[0.18em] text-slate-500">Connectivity</p><p className="mt-2 text-sm font-medium text-slate-900">{currentDevice?.connectivity.join(', ') || 'Not mapped'}</p></div>
             <div className="rounded-2xl bg-slate-50 p-4"><p className="text-xs uppercase tracking-[0.18em] text-slate-500">Applications</p><p className="mt-2 text-sm font-medium text-slate-900">{currentDevice?.applications.join(', ') || 'Not mapped'}</p></div>
+            <div className="rounded-2xl bg-slate-50 p-4 sm:col-span-2"><p className="text-xs uppercase tracking-[0.18em] text-slate-500">Sensors</p><p className="mt-2 whitespace-pre-line text-sm font-medium text-slate-900">{currentDevice?.specs.sensors?.join('\n') || 'Not mapped'}</p></div>
           </div>
           <div className="mt-6 rounded-2xl border border-slate-200 p-4 text-sm text-slate-700">{currentDevice?.protocols.map((protocol) => `${protocol.name} | ${protocol.direction}`).join(', ') || 'No protocols mapped'}</div>
+          {currentDevice ? <DeviceVariantComparison device={currentDevice} /> : null}
         </>
       )}
 

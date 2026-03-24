@@ -34,4 +34,29 @@ export const migrations = [
     description: 'Populate official vendor product page URLs for current devices.',
     command: ['node', 'scripts/nocodb-populate-vendor-urls.mjs', '--apply'],
   },
+  {
+    id: '008-add-device-variant-schema',
+    description: 'Add device variant tables, firmware table, and variant grouping field.',
+    command: ['node', 'scripts/nocodb-add-device-variant-schema.mjs', '--apply'],
+  },
+  {
+    id: '009-simplify-device-variants',
+    description: 'Store firmware summary directly on device variants and backfill from variant firmware rows.',
+    command: ['node', 'scripts/nocodb-simplify-device-variants.mjs', '--apply'],
+  },
+  {
+    id: '010-add-device-sensors-field',
+    description: 'Add device-level sensors field to device specs.',
+    command: ['node', 'scripts/nocodb-add-device-sensors-field.mjs', '--apply'],
+  },
+  {
+    id: '011-populate-device-sensors',
+    description: 'Populate device-level sensors from mapped device variants.',
+    command: ['node', 'scripts/nocodb-populate-device-sensors.mjs', '--apply'],
+  },
+  {
+    id: '012-convert-device-sensors-to-multiselect',
+    description: 'Convert device specs sensors field to MultiSelect and normalize stored values.',
+    command: ['node', 'scripts/nocodb-convert-device-sensors-to-multiselect.mjs', '--apply'],
+  },
 ];

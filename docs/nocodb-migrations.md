@@ -33,6 +33,15 @@ npm run db:migrations:reapply
 1. `001-add-gateway-anchor-fields`
 2. `002-populate-moko-research`
 3. `003-seed-moko-additional-devices`
+4. `004-add-linked-record-columns`
+5. `005-backfill-linked-records`
+6. `006-add-vendor-url-field`
+7. `007-populate-vendor-urls`
+8. `008-add-device-variant-schema`
+9. `009-simplify-device-variants`
+10. `010-add-device-sensors-field`
+11. `011-populate-device-sensors`
+12. `012-convert-device-sensors-to-multiselect`
 
 ## Notes
 

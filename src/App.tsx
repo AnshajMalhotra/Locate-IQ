@@ -60,6 +60,7 @@ const tableIds = {
   deviceTags: 'mvrow0le5anxvcc',
   gatewayProfiles: 'momj1rwqmub764f',
   anchorProfiles: 'm2w2nv5ygb0nz0t',
+  deviceVariants: 'msmzgfblv22rlkh',
 };
 
 function uniqueSorted(values: Array<string | undefined | null>) {
@@ -164,6 +165,24 @@ function buildConnectivityOptions(rows: NocoRow[]) {
     .sort((a, b) => a.label.localeCompare(b.label));
 }
 
+function splitMultilineField(value: string) {
+  return value
+    .split(/\r?\n/)
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+}
+
+function splitSensorField(value: string) {
+  return value
+    .split(/\r?\n|,/)
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+}
+
+function normalizeSensorField(value: string) {
+  return splitSensorField(value).join(',');
+}
+
 function createEmptyDeviceDraft(): DeviceSavePayload {
   return {
     key: '',
@@ -179,6 +198,7 @@ function createEmptyDeviceDraft(): DeviceSavePayload {
     datasheetPath: '',
     specs: {
       bluetoothVersion: '',
+      sensors: '',
       ipRating: '',
       backhaulType: '',
       powerSupply: '',
@@ -222,6 +242,15 @@ function normalizeFileHref(path: string) {
 function matchesQuery(device: Device, query: string) {
   if (!query) return true;
 
+  const variantTerms = (device.variants ?? []).flatMap((variant) => [
+    variant.label,
+    variant.chipset,
+    ...variant.workModes,
+    ...variant.firmwareSummary,
+    ...variant.sensors,
+    ...variant.notes,
+  ]);
+
   const haystack = [
     device.title,
     device.deviceName,
@@ -234,11 +263,14 @@ function matchesQuery(device: Device, query: string) {
     ...device.tags,
     ...device.connectivity,
     ...device.protocolNames,
+    ...(device.specs.sensors ?? []),
     device.specs.backhaulType,
     device.gatewayProfile?.edgeComputingMode,
     device.anchorProfile?.positioningTechnology,
     device.gatewayProfile?.centralEngineDependency,
     device.anchorProfile?.commissioningNotes,
+    device.variantGroup,
+    ...variantTerms,
   ]
     .filter(Boolean)
     .join(' ')
@@ -291,6 +323,7 @@ function mapRowsToDevices(rows: {
   deviceTags: NocoRow[];
   gatewayProfiles: NocoRow[];
   anchorProfiles: NocoRow[];
+  deviceVariants: NocoRow[];
 }) {
   const deviceById = new Map(rows.devices.map((row) => [String(row.Id), row]));
   const specsByKey = new Map(rows.deviceSpecs.map((row) => [row.device_key, row]));
@@ -319,6 +352,18 @@ function mapRowsToDevices(rows: {
   const applicationById = new Map(rows.applications.map((row) => [String(row.Id), row]));
   const tagByKey = new Map(rows.businessTags.map((row) => [row.tag_key, row]));
   const tagById = new Map(rows.businessTags.map((row) => [String(row.Id), row]));
+  const variantsByKey = rows.deviceVariants.reduce<Record<string, NocoRow[]>>((accumulator, row) => {
+    const linkedDeviceId = getLinkedId(row.device_ref) ?? (row.nc_24rw___devices_id ? String(row.nc_24rw___devices_id) : null);
+    const linkedDeviceKey = linkedDeviceId ? getRowString(deviceById.get(linkedDeviceId) ?? {}, 'device_key') : '';
+    const bucketKey = linkedDeviceKey || getRowString(row, 'device_key');
+
+    if (bucketKey) {
+      accumulator[bucketKey] ??= [];
+      accumulator[bucketKey].push(row);
+    }
+
+    return accumulator;
+  }, {});
 
   const connectivityLinks = rows.deviceConnectivity.reduce<Record<string, NocoRow[]>>((accumulator, row) => {
     const linkedDeviceId = getLinkedId(row.device_ref) ?? (row.nc_24rw___devices_id ? String(row.nc_24rw___devices_id) : null);
@@ -378,6 +423,17 @@ function mapRowsToDevices(rows: {
     const specs = specsByDeviceId.get(deviceId) ?? specsByKey.get(deviceKey) ?? {};
     const gatewayProfileRow = gatewayByDeviceId.get(deviceId) ?? gatewayByKey.get(deviceKey);
     const anchorProfileRow = anchorByDeviceId.get(deviceId) ?? anchorByKey.get(deviceKey);
+    const variants = (variantsByKey[deviceKey] ?? [])
+      .sort((a, b) => (getRowNumber(a, 'sort_order') ?? 0) - (getRowNumber(b, 'sort_order') ?? 0))
+      .map((variantRow) => ({
+        id: String(variantRow.Id ?? getRowString(variantRow, 'variant_key')),
+        label: getRowString(variantRow, 'variant_label') || getRowString(variantRow, 'title'),
+        chipset: getRowString(variantRow, 'chipset'),
+        workModes: splitMultilineField(getRowString(variantRow, 'work_modes')),
+        firmwareSummary: splitMultilineField(getRowString(variantRow, 'firmware_summary')),
+        sensors: splitMultilineField(getRowString(variantRow, 'sensors')),
+        notes: splitMultilineField(getRowString(variantRow, 'other_notes')),
+      }));
 
     const protocols: DeviceProtocol[] = (protocolLinks[deviceKey] ?? []).map((link): DeviceProtocol => {
       const protocolKey = getRowString(link, 'protocol_key');
@@ -452,6 +508,7 @@ function mapRowsToDevices(rows: {
       protocolNames: uniqueSorted(protocols.map((protocol) => protocol.name)),
       specs: {
         bluetoothVersion: getRowString(specs, 'bluetooth_version'),
+        sensors: splitSensorField(getRowString(specs, 'sensors')),
         wifiSupport: getRowBoolean(specs, 'wifi_support'),
         wifiBand: getRowString(specs, 'wifi_band'),
         ethernetSupport: getRowBoolean(specs, 'ethernet_support'),
@@ -530,6 +587,8 @@ function mapRowsToDevices(rows: {
             notes: getRowString(anchorProfileRow, 'notes'),
           }
         : undefined,
+      variantGroup: getRowString(deviceRow, 'variant_group'),
+      variants,
       documents,
     };
   });
@@ -589,6 +648,7 @@ function App() {
         deviceTagRows,
         gatewayProfileRows,
         anchorProfileRows,
+        deviceVariantRows,
       ] = await Promise.all([
         fetchTable(normalizedBaseUrl, apiKey, tableIds.devices),
         fetchTable(normalizedBaseUrl, apiKey, tableIds.deviceSpecs),
@@ -602,6 +662,7 @@ function App() {
         fetchTable(normalizedBaseUrl, apiKey, tableIds.deviceTags),
         fetchTable(normalizedBaseUrl, apiKey, tableIds.gatewayProfiles),
         fetchTable(normalizedBaseUrl, apiKey, tableIds.anchorProfiles),
+        fetchTable(normalizedBaseUrl, apiKey, tableIds.deviceVariants),
       ]);
 
       const normalizedDevices = mapRowsToDevices({
@@ -617,6 +678,7 @@ function App() {
         deviceTags: deviceTagRows,
         gatewayProfiles: gatewayProfileRows,
         anchorProfiles: anchorProfileRows,
+        deviceVariants: deviceVariantRows,
       });
 
       setDevices(normalizedDevices);
@@ -767,6 +829,7 @@ function App() {
         title: device.key,
         device_key: device.key,
         bluetooth_version: payload.specs.bluetoothVersion,
+        sensors: normalizeSensorField(payload.specs.sensors),
         ip_rating: payload.specs.ipRating,
         backhaul_type: payload.specs.backhaulType,
         power_supply: payload.specs.powerSupply,
@@ -951,6 +1014,7 @@ function App() {
           title: payload.key.trim(),
           device_key: payload.key.trim(),
           bluetooth_version: payload.specs.bluetoothVersion,
+          sensors: normalizeSensorField(payload.specs.sensors),
           ip_rating: payload.specs.ipRating,
           backhaul_type: payload.specs.backhaulType,
           power_supply: payload.specs.powerSupply,

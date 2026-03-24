@@ -12,6 +12,7 @@ function DeviceCard({ device, isSelected, onSelect }: DeviceCardProps) {
     device.specs.backhaulType,
     device.gatewayProfile?.edgeComputingMode,
     device.anchorProfile?.positioningTechnology,
+    device.variants?.length ? `${device.variants.length} variants` : undefined,
   ].filter(Boolean) as string[];
 
   return (

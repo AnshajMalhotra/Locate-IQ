@@ -14,6 +14,7 @@ export interface DeviceDocument {
 
 export interface DeviceSpecs {
   bluetoothVersion?: string;
+  sensors?: string[];
   wifiSupport: boolean;
   wifiBand?: string;
   ethernetSupport: boolean;
@@ -82,6 +83,16 @@ export interface AnchorProfile {
   notes?: string;
 }
 
+export interface DeviceVariant {
+  id: string;
+  label: string;
+  chipset?: string;
+  workModes: string[];
+  firmwareSummary: string[];
+  sensors: string[];
+  notes: string[];
+}
+
 export interface Device {
   id: string;
   key: string;
@@ -104,6 +115,8 @@ export interface Device {
   specs: DeviceSpecs;
   gatewayProfile?: GatewayProfile;
   anchorProfile?: AnchorProfile;
+  variantGroup?: string;
+  variants?: DeviceVariant[];
   documents: DeviceDocument[];
 }
 
@@ -132,6 +145,7 @@ export interface DeviceSavePayload {
   datasheetPath: string;
   specs: {
     bluetoothVersion: string;
+    sensors: string;
     ipRating: string;
     backhaulType: string;
     powerSupply: string;
@@ -291,6 +305,82 @@ export const mockDevices: Device[] = [
     ],
   },
   {
+    id: 'mock-beacon-2',
+    key: 'beacon_m2_multi_variant_tag',
+    title: 'M2 Multi-Variant Tag',
+    deviceName: 'M2 Tag',
+    modelNumber: 'M2',
+    manufacturer: 'MOKO SMART',
+    category: 'beacon',
+    subcategory: 'BLE RTLS asset tag',
+    role: 'tag / beacon',
+    status: 'active',
+    description: 'BLE tag family with multiple chipset variants that support different positioning modes, firmware tracks, and sensor combinations.',
+    vendorProductUrl: 'https://www.mokosmart.com/',
+    applications: ['Warehouse Tracking', 'Healthcare', 'Indoor Navigation'],
+    tags: ['beacon', 'variant-family', 'rtls'],
+    connectivity: ['BLE'],
+    protocols: [{ key: 'proto_ble', name: 'BLE', direction: 'broadcast' }],
+    protocolNames: ['BLE'],
+    specs: {
+      bluetoothVersion: 'BLE 5.1+',
+      sensors: ['3-axis accelerometer', 'temperature sensor', 'humidity sensor', 'hall-effect sensor'],
+      wifiSupport: false,
+      ethernetSupport: false,
+      poeSupport: false,
+      rj45Support: false,
+      cellularSupport: false,
+      gnssSupport: false,
+      lteSupport: false,
+      ipRating: 'IP67',
+      batteryCapacity: 'Coin cell / SKU dependent',
+      installation: 'Portable tag / badge / asset mount',
+      indoorOutdoorRating: 'Indoor RTLS tag family',
+      maxSignalRangeOpenSpace: 'Variant dependent',
+      maxSignalRangeRealWorld: 'Depends on antenna design, layout, and positioning mode.',
+    },
+    variantGroup: 'M2 Tag Family',
+    variants: [
+      {
+        id: 'm2_nordic_52810',
+        label: 'M2 (Nordic 52810)',
+        chipset: 'Nordic 52810',
+        workModes: ['BLE AoA', 'BLE RSSI'],
+        firmwareSummary: ['BLE firmware AoA: BXP-A-C', 'BLE firmware RSSI: BXP-D'],
+        sensors: ['3-axis accelerometer'],
+        notes: ['Standard variant for BLE AoA tag'],
+      },
+      {
+        id: 'm2_nordic_52805',
+        label: 'M2 (Nordic 52805)',
+        chipset: 'Nordic 52805',
+        workModes: ['BLE AoA', 'BLE RSSI'],
+        firmwareSummary: ['BLE firmware AoA: BXP-A-C', 'BLE firmware RSSI: BXP-DH'],
+        sensors: ['3-axis accelerometer'],
+        notes: [],
+      },
+      {
+        id: 'm2_nordic_52832',
+        label: 'M2 (Nordic 52832)',
+        chipset: 'Nordic 52832',
+        workModes: ['BLE RSSI'],
+        firmwareSummary: [],
+        sensors: ['3-axis accelerometer', 'temperature'],
+        notes: [],
+      },
+      {
+        id: 'm2_efr32bg22',
+        label: 'M2 (EFR32BG22)',
+        chipset: 'EFR32BG22',
+        workModes: ['BLE AoA (for Quuppa)'],
+        firmwareSummary: ['BLE firmware: Quuppa v3'],
+        sensors: [],
+        notes: ['Variant for BLE AoA'],
+      },
+    ],
+    documents: [],
+  },
+  {
     id: 'mock-beacon-1',
     key: 'beacon_m5_high_temp_tag',
     title: 'M5 High-Temp Resistant Tag',
@@ -311,6 +401,7 @@ export const mockDevices: Device[] = [
     protocolNames: ['BLE'],
     specs: {
       bluetoothVersion: 'BLE 5.0',
+      sensors: ['accelerometer', 'temperature sensor', 'hall switch'],
       wifiSupport: false,
       ethernetSupport: false,
       poeSupport: false,
