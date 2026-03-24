@@ -400,6 +400,7 @@ function DeviceDetailPanel({
           <div className="grid gap-3 sm:grid-cols-2">
             <Field label="Bluetooth Version" value={activeDraft.specs.bluetoothVersion} onChange={(value) => updateSpecs('bluetoothVersion', value)} />
             <Field label="Sensors" value={activeDraft.specs.sensors} onChange={(value) => updateSpecs('sensors', value)} rows={3} />
+            <Field label="Battery Lifespan" value={activeDraft.specs.batteryLifeEstimate} onChange={(value) => updateSpecs('batteryLifeEstimate', value)} />
             <Field label="IP Rating" value={activeDraft.specs.ipRating} onChange={(value) => updateSpecs('ipRating', value)} />
             <Field label="Backhaul Type" value={activeDraft.specs.backhaulType} onChange={(value) => updateSpecs('backhaulType', value)} />
             <Field label="Power Supply" value={activeDraft.specs.powerSupply} onChange={(value) => updateSpecs('powerSupply', value)} />
@@ -535,7 +536,7 @@ function DeviceDetailPanel({
                 <div className="space-y-4">
                   <div className="grid gap-3 sm:grid-cols-2">
                     <ReadOnlyField label="Bluetooth Version" value={currentDevice.specs.bluetoothVersion} />
-                    <ReadOnlyField label="Battery Life" value={batteryLifeValue} />
+                    <ReadOnlyField label="Battery Lifespan" value={batteryLifeValue} />
                     <ReadOnlyField label="Battery Capacity" value={currentDevice.specs.batteryCapacity} />
                     <ReadOnlyField label="Power Supply" value={currentDevice.specs.powerSupply} multiline />
                     <ReadOnlyField label="Backhaul Type" value={currentDevice.specs.backhaulType} multiline />

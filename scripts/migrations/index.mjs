@@ -59,4 +59,14 @@ export const migrations = [
     description: 'Convert device specs sensors field to MultiSelect and normalize stored values.',
     command: ['node', 'scripts/nocodb-convert-device-sensors-to-multiselect.mjs', '--apply'],
   },
+  {
+    id: '013-add-device-battery-life-field',
+    description: 'Add battery lifespan field to device specs.',
+    command: ['node', 'scripts/nocodb-add-device-battery-life-field.mjs', '--apply'],
+  },
+  {
+    id: '014-populate-device-battery-life',
+    description: 'Populate battery lifespan values from source-backed device documentation.',
+    command: ['node', 'scripts/nocodb-populate-device-battery-life.mjs', '--apply'],
+  },
 ];

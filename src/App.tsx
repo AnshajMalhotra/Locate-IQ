@@ -200,7 +200,32 @@ function inferBatteryLifeEstimate(specs: Pick<Device['specs'], 'batteryLifeEstim
 }
 
 function getBatteryLifeLabel(device: Device) {
-  return inferBatteryLifeEstimate(device.specs) || 'Not mapped';
+  return device.specs.batteryLifeEstimate?.trim() || inferBatteryLifeEstimate(device.specs) || 'Not mapped';
+}
+
+function countActiveFilters(filters: FilterState) {
+  const multiCount =
+    filters.categories.length +
+    filters.manufacturers.length +
+    filters.applications.length +
+    filters.protocols.length +
+    filters.connectivity.length +
+    filters.tags.length +
+    filters.batteryLife.length +
+    filters.ipRatings.length +
+    filters.edgeModes.length +
+    filters.status.length;
+
+  const booleanCount = [
+    filters.requirePoe,
+    filters.requireEthernet,
+    filters.requireWifi,
+    filters.requireCellular,
+    filters.requireGnss,
+    filters.requireLocalCompute,
+  ].filter(Boolean).length;
+
+  return multiCount + booleanCount;
 }
 
 function normalizeSearchTerms(query: string) {
@@ -547,12 +572,14 @@ function mapRowsToDevices(rows: {
       specs: {
         bluetoothVersion: getRowString(specs, 'bluetooth_version'),
         sensors: splitSensorField(getRowString(specs, 'sensors')),
-        batteryLifeEstimate: inferBatteryLifeEstimate({
-          batteryLifeEstimate: getRowString(specs, 'battery_life_estimate'),
-          powerSupply: getRowString(specs, 'power_supply'),
-          batteryCapacity: getRowString(specs, 'battery_capacity'),
-          replaceableBattery: getRowBoolean(specs, 'replaceable_battery'),
-        }),
+        batteryLifeEstimate:
+          getRowString(specs, 'battery_life_estimate') ||
+          inferBatteryLifeEstimate({
+            batteryLifeEstimate: getRowString(specs, 'battery_life_estimate'),
+            powerSupply: getRowString(specs, 'power_supply'),
+            batteryCapacity: getRowString(specs, 'battery_capacity'),
+            replaceableBattery: getRowBoolean(specs, 'replaceable_battery'),
+          }),
         wifiSupport: getRowBoolean(specs, 'wifi_support'),
         wifiBand: getRowString(specs, 'wifi_band'),
         ethernetSupport: getRowBoolean(specs, 'ethernet_support'),
@@ -661,6 +688,7 @@ function App() {
   ]);
   const [saveState, setSaveState] = useState<SaveState>('idle');
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
+  const [isAdvancedFilterOpen, setIsAdvancedFilterOpen] = useState(false);
 
   const deferredSearchQuery = useDeferredValue(searchQuery);
   const baseUrl = import.meta.env.VITE_NOCODB_BASE_URL;
@@ -783,6 +811,20 @@ function App() {
     statuses: uniqueSorted(devices.map((device) => device.status)),
   };
 
+  const activeFilterCount = countActiveFilters(filters);
+  const selectedFilterChips = [
+    ...filters.categories.map((value) => ({ key: `categories:${value}`, label: `Category: ${value}` })),
+    ...filters.connectivity.map((value) => ({ key: `connectivity:${value}`, label: `Connectivity: ${value}` })),
+    ...filters.batteryLife.map((value) => ({ key: `batteryLife:${value}`, label: `Battery: ${value}` })),
+    ...filters.applications.map((value) => ({ key: `applications:${value}`, label: `Use Case: ${value}` })),
+    ...filters.status.map((value) => ({ key: `status:${value}`, label: `Status: ${value}` })),
+    ...filters.manufacturers.map((value) => ({ key: `manufacturers:${value}`, label: `Manufacturer: ${value}` })),
+    ...filters.protocols.map((value) => ({ key: `protocols:${value}`, label: `Protocol: ${value}` })),
+    ...filters.tags.map((value) => ({ key: `tags:${value}`, label: `Tag: ${value}` })),
+    ...filters.ipRatings.map((value) => ({ key: `ipRatings:${value}`, label: `IP: ${value}` })),
+    ...filters.edgeModes.map((value) => ({ key: `edgeModes:${value}`, label: `Edge: ${value}` })),
+  ];
+
   const stats = {
     total: devices.length,
     gateways: devices.filter((device) => device.category === 'gateway').length,
@@ -807,6 +849,29 @@ function App() {
       ...current,
       [key]: !current[key],
     }));
+  }
+
+  function setSingleFilter(key: keyof FilterState, value: string) {
+    setFilters((current) => ({
+      ...current,
+      [key]: value ? [value] : [],
+    }));
+  }
+
+  function removeSelectedFilter(filterKey: string) {
+    const [group, ...rest] = filterKey.split(':');
+    const value = rest.join(':');
+    if (!value) return;
+
+    setFilters((current) => {
+      const currentValues = current[group as keyof FilterState];
+      if (!Array.isArray(currentValues)) return current;
+
+      return {
+        ...current,
+        [group]: currentValues.filter((entry) => entry !== value),
+      };
+    });
   }
 
   function resetFilters() {
@@ -876,6 +941,7 @@ function App() {
         device_key: device.key,
         bluetooth_version: payload.specs.bluetoothVersion,
         sensors: normalizeSensorField(payload.specs.sensors),
+        battery_life_estimate: payload.specs.batteryLifeEstimate,
         ip_rating: payload.specs.ipRating,
         backhaul_type: payload.specs.backhaulType,
         power_supply: payload.specs.powerSupply,
@@ -1061,6 +1127,7 @@ function App() {
           device_key: payload.key.trim(),
           bluetooth_version: payload.specs.bluetoothVersion,
           sensors: normalizeSensorField(payload.specs.sensors),
+          battery_life_estimate: payload.specs.batteryLifeEstimate,
           ip_rating: payload.specs.ipRating,
           backhaul_type: payload.specs.backhaulType,
           power_supply: payload.specs.powerSupply,
@@ -1204,15 +1271,7 @@ function App() {
         </div>
       </header>
 
-      <main className="relative mx-auto grid max-w-[1540px] gap-6 px-5 py-8 lg:grid-cols-[320px_minmax(0,1fr)_400px] lg:px-8">
-        <FilterSidebar
-          filters={filters}
-          options={filterOptions}
-          onToggleMulti={toggleMulti}
-          onToggleBoolean={toggleBoolean}
-          onReset={resetFilters}
-        />
-
+      <main className="relative mx-auto grid max-w-[1540px] gap-6 px-5 py-8 lg:grid-cols-[minmax(0,1fr)_400px] lg:px-8">
         <section className="space-y-6">
           <SearchBar
             value={searchQuery}
@@ -1221,6 +1280,26 @@ function App() {
             totalCount={devices.length}
             canAddDevice={canEditDatabase}
             onAddDevice={startCreateDevice}
+            categoryOptions={filterOptions.categories}
+            connectivityOptions={filterOptions.connectivity}
+            applicationOptions={filterOptions.applications}
+            batteryLifeOptions={filterOptions.batteryLife}
+            statusOptions={filterOptions.statuses}
+            selectedCategory={filters.categories[0] ?? ''}
+            selectedConnectivity={filters.connectivity[0] ?? ''}
+            selectedApplication={filters.applications[0] ?? ''}
+            selectedBatteryLife={filters.batteryLife[0] ?? ''}
+            selectedStatus={filters.status[0] ?? ''}
+            onCategoryChange={(value) => setSingleFilter('categories', value)}
+            onConnectivityChange={(value) => setSingleFilter('connectivity', value)}
+            onApplicationChange={(value) => setSingleFilter('applications', value)}
+            onBatteryLifeChange={(value) => setSingleFilter('batteryLife', value)}
+            onStatusChange={(value) => setSingleFilter('status', value)}
+            onOpenAdvancedFilters={() => setIsAdvancedFilterOpen(true)}
+            activeFilterCount={activeFilterCount}
+            selectedFilters={selectedFilterChips}
+            onRemoveFilter={removeSelectedFilter}
+            onResetFilters={resetFilters}
           />
 
           {connectionError && (
@@ -1285,6 +1364,37 @@ function App() {
           ) : null}
         </div>
       </main>
+
+      {isAdvancedFilterOpen ? (
+        <div className="fixed inset-0 z-50 flex justify-end bg-slate-950/35 backdrop-blur-sm">
+          <button type="button" aria-label="Close advanced filters" className="flex-1 cursor-default" onClick={() => setIsAdvancedFilterOpen(false)} />
+          <div className="flex h-full w-full max-w-[420px] flex-col border-l border-slate-200 bg-white p-5 shadow-[-24px_0_60px_-35px_rgba(15,23,42,0.45)]">
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Advanced Filters</p>
+                <h3 className="mt-1 text-xl font-semibold text-slate-950">Refine the shortlist</h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsAdvancedFilterOpen(false)}
+                className="rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-300 hover:text-slate-950"
+              >
+                Close
+              </button>
+            </div>
+
+            <div className="min-h-0 flex-1 overflow-y-auto pr-1">
+              <FilterSidebar
+                filters={filters}
+                options={filterOptions}
+                onToggleMulti={toggleMulti}
+                onToggleBoolean={toggleBoolean}
+                onReset={resetFilters}
+              />
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

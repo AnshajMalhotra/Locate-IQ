@@ -42,6 +42,8 @@ npm run db:migrations:reapply
 10. `010-add-device-sensors-field`
 11. `011-populate-device-sensors`
 12. `012-convert-device-sensors-to-multiselect`
+13. `013-add-device-battery-life-field`
+14. `014-populate-device-battery-life`
 
 ## Notes
 

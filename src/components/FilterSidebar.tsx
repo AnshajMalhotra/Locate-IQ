@@ -153,7 +153,7 @@ function FilterSidebar({ filters, options, onToggleMulti, onToggleBoolean, onRes
       </section>
 
       <section className="space-y-3">
-        <h4 className="text-sm font-semibold text-slate-900">Battery Life</h4>
+        <h4 className="text-sm font-semibold text-slate-900">Battery Lifespan</h4>
         {renderChipGroup(options.batteryLife, filters.batteryLife, (value) => onToggleMulti('batteryLife', value), 'No battery profile data loaded')}
       </section>
 
