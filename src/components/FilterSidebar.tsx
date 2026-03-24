@@ -5,6 +5,7 @@ interface FilterState {
   protocols: string[];
   connectivity: string[];
   tags: string[];
+  batteryLife: string[];
   ipRatings: string[];
   edgeModes: string[];
   status: string[];
@@ -23,6 +24,7 @@ interface FilterOptions {
   protocols: string[];
   connectivity: string[];
   tags: string[];
+  batteryLife: string[];
   ipRatings: string[];
   edgeModes: string[];
   statuses: string[];
@@ -148,6 +150,11 @@ function FilterSidebar({ filters, options, onToggleMulti, onToggleBoolean, onRes
       <section className="space-y-3">
         <h4 className="text-sm font-semibold text-slate-900">IP Rating</h4>
         {renderChipGroup(options.ipRatings, filters.ipRatings, (value) => onToggleMulti('ipRatings', value), 'No IP ratings loaded')}
+      </section>
+
+      <section className="space-y-3">
+        <h4 className="text-sm font-semibold text-slate-900">Battery Life</h4>
+        {renderChipGroup(options.batteryLife, filters.batteryLife, (value) => onToggleMulti('batteryLife', value), 'No battery profile data loaded')}
       </section>
 
       <section className="space-y-3">

@@ -18,6 +18,7 @@ type FilterState = {
   protocols: string[];
   connectivity: string[];
   tags: string[];
+  batteryLife: string[];
   ipRatings: string[];
   edgeModes: string[];
   status: string[];
@@ -36,6 +37,7 @@ const defaultFilters: FilterState = {
   protocols: [],
   connectivity: [],
   tags: [],
+  batteryLife: [],
   ipRatings: [],
   edgeModes: [],
   status: [],
@@ -183,6 +185,34 @@ function normalizeSensorField(value: string) {
   return splitSensorField(value).join(',');
 }
 
+function inferBatteryLifeEstimate(specs: Pick<Device['specs'], 'batteryLifeEstimate' | 'powerSupply' | 'batteryCapacity' | 'replaceableBattery'>) {
+  if (specs.batteryLifeEstimate?.trim()) return specs.batteryLifeEstimate.trim();
+
+  const powerText = `${specs.powerSupply ?? ''} ${specs.batteryCapacity ?? ''}`.toLowerCase();
+  const hasExternalPower = /\bpoe\b|\bdc\b|\bac\b|\busb\b|external|hard-wired|wired/.test(powerText);
+  const hasBattery = Boolean(specs.batteryCapacity?.trim()) || Boolean(specs.replaceableBattery);
+
+  if (hasExternalPower && hasBattery) return 'External power with battery backup';
+  if (hasExternalPower) return 'Externally powered';
+  if (hasBattery) return 'Battery-powered';
+
+  return '';
+}
+
+function getBatteryLifeLabel(device: Device) {
+  return inferBatteryLifeEstimate(device.specs) || 'Not mapped';
+}
+
+function normalizeSearchTerms(query: string) {
+  const ignored = new Set(['a', 'an', 'and', 'by', 'for', 'from', 'in', 'into', 'of', 'on', 'or', 'the', 'to', 'with']);
+
+  return query
+    .toLowerCase()
+    .split(/[^a-z0-9.+-]+/)
+    .map((term) => term.trim())
+    .filter((term) => term.length > 1 && !ignored.has(term));
+}
+
 function createEmptyDeviceDraft(): DeviceSavePayload {
   return {
     key: '',
@@ -199,6 +229,7 @@ function createEmptyDeviceDraft(): DeviceSavePayload {
     specs: {
       bluetoothVersion: '',
       sensors: '',
+      batteryLifeEstimate: '',
       ipRating: '',
       backhaulType: '',
       powerSupply: '',
@@ -242,6 +273,9 @@ function normalizeFileHref(path: string) {
 function matchesQuery(device: Device, query: string) {
   if (!query) return true;
 
+  const searchTerms = normalizeSearchTerms(query);
+  if (!searchTerms.length) return true;
+
   const variantTerms = (device.variants ?? []).flatMap((variant) => [
     variant.label,
     variant.chipset,
@@ -264,6 +298,10 @@ function matchesQuery(device: Device, query: string) {
     ...device.connectivity,
     ...device.protocolNames,
     ...(device.specs.sensors ?? []),
+    device.specs.batteryLifeEstimate,
+    getBatteryLifeLabel(device),
+    device.specs.batteryCapacity,
+    device.specs.powerSupply,
     device.specs.backhaulType,
     device.gatewayProfile?.edgeComputingMode,
     device.anchorProfile?.positioningTechnology,
@@ -276,7 +314,7 @@ function matchesQuery(device: Device, query: string) {
     .join(' ')
     .toLowerCase();
 
-  return haystack.includes(query.toLowerCase());
+  return searchTerms.every((term) => haystack.includes(term));
 }
 
 function includesEverySelection(deviceValues: string[], selectedValues: string[]) {
@@ -509,6 +547,12 @@ function mapRowsToDevices(rows: {
       specs: {
         bluetoothVersion: getRowString(specs, 'bluetooth_version'),
         sensors: splitSensorField(getRowString(specs, 'sensors')),
+        batteryLifeEstimate: inferBatteryLifeEstimate({
+          batteryLifeEstimate: getRowString(specs, 'battery_life_estimate'),
+          powerSupply: getRowString(specs, 'power_supply'),
+          batteryCapacity: getRowString(specs, 'battery_capacity'),
+          replaceableBattery: getRowBoolean(specs, 'replaceable_battery'),
+        }),
         wifiSupport: getRowBoolean(specs, 'wifi_support'),
         wifiBand: getRowString(specs, 'wifi_band'),
         ethernetSupport: getRowBoolean(specs, 'ethernet_support'),
@@ -704,6 +748,7 @@ function App() {
     if (filters.categories.length && !filters.categories.includes(device.category)) return false;
     if (filters.manufacturers.length && !filters.manufacturers.includes(device.manufacturer)) return false;
     if (filters.status.length && !filters.status.includes(device.status)) return false;
+    if (filters.batteryLife.length && !filters.batteryLife.includes(getBatteryLifeLabel(device))) return false;
     if (filters.ipRatings.length && !includesAnySelection(device.specs.ipRating, filters.ipRatings)) return false;
     if (filters.edgeModes.length && !includesAnySelection(device.gatewayProfile?.edgeComputingMode, filters.edgeModes)) return false;
     if (!includesEverySelection(device.applications, filters.applications)) return false;
@@ -732,6 +777,7 @@ function App() {
     protocols: uniqueSorted(devices.flatMap((device) => device.protocolNames)),
     connectivity: uniqueSorted(devices.flatMap((device) => device.connectivity)),
     tags: uniqueSorted(devices.flatMap((device) => device.tags)),
+    batteryLife: uniqueSorted(devices.map((device) => getBatteryLifeLabel(device)).filter((value) => value !== 'Not mapped')),
     ipRatings: uniqueSorted(devices.map((device) => device.specs.ipRating)),
     edgeModes: uniqueSorted(devices.map((device) => device.gatewayProfile?.edgeComputingMode)),
     statuses: uniqueSorted(devices.map((device) => device.status)),

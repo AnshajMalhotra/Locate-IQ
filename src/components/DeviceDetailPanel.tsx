@@ -16,6 +16,8 @@ interface DeviceDetailPanelProps {
   onCreate: (payload: DeviceSavePayload) => Promise<void>;
 }
 
+type DetailTab = 'overview' | 'specs' | 'profiles' | 'variants' | 'documents';
+
 const inputClass =
   'w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-950 outline-none transition focus:border-emerald-400 focus:bg-white';
 
@@ -35,6 +37,7 @@ function createPanelEmptyDraft(): DeviceSavePayload {
     specs: {
       bluetoothVersion: '',
       sensors: '',
+      batteryLifeEstimate: '',
       ipRating: '',
       backhaulType: '',
       powerSupply: '',
@@ -89,6 +92,7 @@ function buildDraft(device: Device, protocolOptions: DeviceOption[], connectivit
     specs: {
       bluetoothVersion: device.specs.bluetoothVersion ?? '',
       sensors: device.specs.sensors?.join('\n') ?? '',
+      batteryLifeEstimate: device.specs.batteryLifeEstimate ?? '',
       ipRating: device.specs.ipRating ?? '',
       backhaulType: device.specs.backhaulType ?? '',
       powerSupply: device.specs.powerSupply ?? '',
@@ -135,6 +139,55 @@ function Field({ label, value, onChange, rows = 1 }: { label: string; value: str
         <input value={value} onChange={(event) => onChange(event.target.value)} className={inputClass} />
       )}
     </label>
+  );
+}
+
+function formatDisplayValue(value: string | number | undefined | null) {
+  if (value === undefined || value === null) return 'Not mapped';
+  const normalized = String(value).trim();
+  return normalized || 'Not mapped';
+}
+
+function formatBooleanValue(value: boolean | undefined) {
+  if (value === undefined) return 'Not mapped';
+  return value ? 'Yes' : 'No';
+}
+
+function ReadOnlyField({
+  label,
+  value,
+  multiline = false,
+}: {
+  label: string;
+  value: string | number | undefined | null;
+  multiline?: boolean;
+}) {
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">{label}</p>
+      <p className={`mt-2 text-sm font-medium text-slate-900 ${multiline ? 'whitespace-pre-line leading-6' : ''}`}>{formatDisplayValue(value)}</p>
+    </div>
+  );
+}
+
+function ReadOnlyPillGroup({ label, values }: { label: string; values: string[] }) {
+  const normalizedValues = values.filter(Boolean);
+
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">{label}</p>
+      {normalizedValues.length ? (
+        <div className="mt-3 flex flex-wrap gap-2">
+          {normalizedValues.map((value) => (
+            <span key={`${label}-${value}`} className="rounded-full bg-white px-3 py-1.5 text-xs font-medium text-slate-700">
+              {value}
+            </span>
+          ))}
+        </div>
+      ) : (
+        <p className="mt-2 text-sm font-medium text-slate-900">Not mapped</p>
+      )}
+    </div>
   );
 }
 
@@ -228,6 +281,7 @@ function DeviceDetailPanel({
   onCreate,
 }: DeviceDetailPanelProps) {
   const [isEditing, setIsEditing] = useState(false);
+  const [activeTab, setActiveTab] = useState<DetailTab>('overview');
   const [draft, setDraft] = useState<DeviceSavePayload | null>(null);
   const [localError, setLocalError] = useState<string | null>(null);
 
@@ -276,8 +330,19 @@ function DeviceDetailPanel({
     }
   }
 
+  const batteryLifeValue = currentDevice?.specs.batteryLifeEstimate ?? '';
+  const readTabs = currentDevice
+    ? [
+        { key: 'overview' as const, label: 'Overview' },
+        { key: 'specs' as const, label: 'Specs' },
+        ...(currentDevice.gatewayProfile || currentDevice.anchorProfile ? [{ key: 'profiles' as const, label: 'Profiles' }] : []),
+        ...(currentDevice.variants?.length ? [{ key: 'variants' as const, label: 'Variants' }] : []),
+        { key: 'documents' as const, label: 'Documents' },
+      ]
+    : [];
+
   return (
-    <aside className="rounded-[28px] border border-slate-200 bg-white/90 p-6 shadow-[0_18px_60px_-35px_rgba(15,23,42,0.45)] backdrop-blur">
+    <aside className="flex max-h-[calc(100vh-3rem)] min-h-[520px] flex-col rounded-[28px] border border-slate-200 bg-white/90 p-6 shadow-[0_18px_60px_-35px_rgba(15,23,42,0.45)] backdrop-blur">
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-700">Device Details</p>
@@ -308,8 +373,9 @@ function DeviceDetailPanel({
         </div>
       )}
 
+      <div className="mt-6 min-h-0 flex-1 overflow-y-auto pr-1">
       {isEditing ? (
-        <div className="mt-6 space-y-6">
+        <div className="space-y-6">
           <div className="grid gap-3 sm:grid-cols-2">
             <Field label="Device Key" value={activeDraft.key} onChange={(value) => updateDraft({ key: value })} />
             <label className="space-y-2">
@@ -415,18 +481,177 @@ function DeviceDetailPanel({
         </div>
       ) : (
         <>
-          {currentDevice?.vendorProductUrl ? <div className="mt-4"><a href={currentDevice.vendorProductUrl} target="_blank" rel="noreferrer" className="inline-flex items-center rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700">Official product page</a></div> : null}
-          <p className="mt-4 text-sm leading-6 text-slate-700">{currentDevice?.description}</p>
-          <div className="mt-6 grid gap-3 sm:grid-cols-2">
-            <div className="rounded-2xl bg-slate-50 p-4"><p className="text-xs uppercase tracking-[0.18em] text-slate-500">Connectivity</p><p className="mt-2 text-sm font-medium text-slate-900">{currentDevice?.connectivity.join(', ') || 'Not mapped'}</p></div>
-            <div className="rounded-2xl bg-slate-50 p-4"><p className="text-xs uppercase tracking-[0.18em] text-slate-500">Applications</p><p className="mt-2 text-sm font-medium text-slate-900">{currentDevice?.applications.join(', ') || 'Not mapped'}</p></div>
-            <div className="rounded-2xl bg-slate-50 p-4 sm:col-span-2"><p className="text-xs uppercase tracking-[0.18em] text-slate-500">Sensors</p><p className="mt-2 whitespace-pre-line text-sm font-medium text-slate-900">{currentDevice?.specs.sensors?.join('\n') || 'Not mapped'}</p></div>
-          </div>
-          <div className="mt-6 rounded-2xl border border-slate-200 p-4 text-sm text-slate-700">{currentDevice?.protocols.map((protocol) => `${protocol.name} | ${protocol.direction}`).join(', ') || 'No protocols mapped'}</div>
-          {currentDevice ? <DeviceVariantComparison device={currentDevice} /> : null}
+          {currentDevice ? (
+            <>
+              <div className="mb-4 flex flex-wrap items-center gap-2">
+                {readTabs.map((tab) => (
+                  <button
+                    key={tab.key}
+                    type="button"
+                    onClick={() => setActiveTab(tab.key)}
+                    className={`rounded-full px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] transition ${
+                      activeTab === tab.key ? 'bg-slate-950 text-white' : 'border border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:text-slate-900'
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+
+              {activeTab === 'overview' && (
+                <div className="space-y-4">
+                  {currentDevice.vendorProductUrl ? (
+                    <div>
+                      <a href={currentDevice.vendorProductUrl} target="_blank" rel="noreferrer" className="inline-flex items-center rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700">
+                        Official product page
+                      </a>
+                    </div>
+                  ) : null}
+
+                  <div className="rounded-[24px] border border-slate-200 bg-slate-50/70 p-5">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Description</p>
+                    <p className="mt-3 text-sm leading-6 text-slate-700">{currentDevice.description}</p>
+                  </div>
+
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <ReadOnlyField label="Category" value={currentDevice.category} />
+                    <ReadOnlyField label="Status" value={currentDevice.status} />
+                    <ReadOnlyField label="Manufacturer" value={currentDevice.manufacturer} />
+                    <ReadOnlyField label="Model Number" value={currentDevice.modelNumber} />
+                    <ReadOnlyField label="Subcategory" value={currentDevice.subcategory} />
+                    <ReadOnlyField label="Role" value={currentDevice.role} />
+                  </div>
+
+                  <div className="grid gap-3">
+                    <ReadOnlyPillGroup label="Connectivity" values={currentDevice.connectivity} />
+                    <ReadOnlyPillGroup label="Applications" values={currentDevice.applications} />
+                    <ReadOnlyPillGroup label="Business Tags" values={currentDevice.tags} />
+                    <ReadOnlyPillGroup label="Protocols" values={currentDevice.protocols.map((protocol) => `${protocol.name} | ${protocol.direction}`)} />
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'specs' && (
+                <div className="space-y-4">
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <ReadOnlyField label="Bluetooth Version" value={currentDevice.specs.bluetoothVersion} />
+                    <ReadOnlyField label="Battery Life" value={batteryLifeValue} />
+                    <ReadOnlyField label="Battery Capacity" value={currentDevice.specs.batteryCapacity} />
+                    <ReadOnlyField label="Power Supply" value={currentDevice.specs.powerSupply} multiline />
+                    <ReadOnlyField label="Backhaul Type" value={currentDevice.specs.backhaulType} multiline />
+                    <ReadOnlyField label="IP Rating" value={currentDevice.specs.ipRating} />
+                    <ReadOnlyField label="Installation" value={currentDevice.specs.installation} multiline />
+                    <ReadOnlyField label="Dimensions" value={currentDevice.specs.dimensions} />
+                    <ReadOnlyField label="Weight" value={currentDevice.specs.weight} />
+                    <ReadOnlyField label="Material" value={currentDevice.specs.material} />
+                    <ReadOnlyField
+                      label="Operating Temperature"
+                      value={
+                        currentDevice.specs.operatingTempMinC !== undefined || currentDevice.specs.operatingTempMaxC !== undefined
+                          ? `${currentDevice.specs.operatingTempMinC ?? '?'} to ${currentDevice.specs.operatingTempMaxC ?? '?'} C`
+                          : ''
+                      }
+                    />
+                    <ReadOnlyField label="Indoor / Outdoor" value={currentDevice.specs.indoorOutdoorRating} multiline />
+                    <ReadOnlyField label="Max Range Open Space" value={currentDevice.specs.maxSignalRangeOpenSpace} multiline />
+                    <ReadOnlyField label="Max Range Real World" value={currentDevice.specs.maxSignalRangeRealWorld} multiline />
+                    <ReadOnlyField label="PoE Support" value={formatBooleanValue(currentDevice.specs.poeSupport)} />
+                    <ReadOnlyField label="PoE Standard" value={currentDevice.specs.poeStandard} />
+                    <ReadOnlyField label="Ethernet Support" value={formatBooleanValue(currentDevice.specs.ethernetSupport)} />
+                    <ReadOnlyField label="Wi-Fi Support" value={formatBooleanValue(currentDevice.specs.wifiSupport)} />
+                    <ReadOnlyField label="Cellular Support" value={formatBooleanValue(currentDevice.specs.cellularSupport)} />
+                    <ReadOnlyField label="Cellular Type" value={currentDevice.specs.cellularType} />
+                    <ReadOnlyField label="GNSS Support" value={formatBooleanValue(currentDevice.specs.gnssSupport)} />
+                    <ReadOnlyField label="LTE Category" value={currentDevice.specs.lteCategory} />
+                    <ReadOnlyField label="Replaceable Battery" value={formatBooleanValue(currentDevice.specs.replaceableBattery)} />
+                  </div>
+                  <ReadOnlyPillGroup label="Sensors" values={currentDevice.specs.sensors ?? []} />
+                </div>
+              )}
+
+              {activeTab === 'profiles' && (
+                <div className="space-y-4">
+                  {currentDevice.anchorProfile ? (
+                    <div className="space-y-3 rounded-[24px] border border-amber-200 bg-amber-50/70 p-4">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-700">Anchor Profile</p>
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <ReadOnlyField label="Positioning Technology" value={currentDevice.anchorProfile.positioningTechnology} />
+                        <ReadOnlyField label="Positioning Accuracy" value={currentDevice.anchorProfile.positioningAccuracy} />
+                        <ReadOnlyField label="Installation Height" value={currentDevice.anchorProfile.installationHeight} />
+                        <ReadOnlyField label="Coverage Area" value={currentDevice.anchorProfile.coverageArea} multiline />
+                        <ReadOnlyField label="Network Protocols" value={currentDevice.anchorProfile.networkProtocols} multiline />
+                        <ReadOnlyField label="Mounting Mode" value={currentDevice.anchorProfile.mountingMode} />
+                        <ReadOnlyField label="Sync Requirement" value={currentDevice.anchorProfile.syncRequirement} multiline />
+                        <ReadOnlyField label="Anchor Spacing" value={currentDevice.anchorProfile.recommendedAnchorSpacing} multiline />
+                        <ReadOnlyField label="Anchor Density" value={currentDevice.anchorProfile.recommendedAnchorDensity} multiline />
+                        <ReadOnlyField label="Line of Sight" value={currentDevice.anchorProfile.lineOfSightRequirement} multiline />
+                        <ReadOnlyField label="Metal Interference" value={currentDevice.anchorProfile.metalInterferenceRisk} multiline />
+                        <ReadOnlyField label="Positioning Engine" value={currentDevice.anchorProfile.positioningEngineLocation} />
+                        <ReadOnlyField label="Raw Signal Forwarding" value={formatBooleanValue(currentDevice.anchorProfile.rawSignalForwarding)} />
+                        <ReadOnlyField label="Cascade Supported" value={formatBooleanValue(currentDevice.anchorProfile.cascadeSupported)} />
+                        <ReadOnlyField label="Installation Prerequisites" value={currentDevice.anchorProfile.installationPrerequisites} multiline />
+                        <ReadOnlyField label="Commissioning Notes" value={currentDevice.anchorProfile.commissioningNotes} multiline />
+                        <div className="sm:col-span-2">
+                          <ReadOnlyField label="Notes" value={currentDevice.anchorProfile.notes} multiline />
+                        </div>
+                      </div>
+                    </div>
+                  ) : null}
+
+                  {currentDevice.gatewayProfile ? (
+                    <div className="space-y-3 rounded-[24px] bg-slate-950 p-4">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-300">Gateway Profile</p>
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <ReadOnlyField label="Payload Format" value={currentDevice.gatewayProfile.payloadFormat} />
+                        <ReadOnlyField label="Edge Mode" value={currentDevice.gatewayProfile.edgeComputingMode} />
+                        <ReadOnlyField label="Configuration Method" value={currentDevice.gatewayProfile.configurationMethod} multiline />
+                        <ReadOnlyField label="Central Engine Dependency" value={currentDevice.gatewayProfile.centralEngineDependency} multiline />
+                        <ReadOnlyField label="Downlink Supported" value={formatBooleanValue(currentDevice.gatewayProfile.downlinkSupported)} />
+                        <ReadOnlyField label="Calculates Coordinates Locally" value={formatBooleanValue(currentDevice.gatewayProfile.calculatesCoordinatesLocally)} />
+                        <ReadOnlyField label="Forwards Raw Signals" value={formatBooleanValue(currentDevice.gatewayProfile.forwardsRawSignals)} />
+                        <ReadOnlyField label="Refresh Rate Config" value={formatBooleanValue(currentDevice.gatewayProfile.supportsRefreshRateConfig)} />
+                        <ReadOnlyField label="LED Control" value={formatBooleanValue(currentDevice.gatewayProfile.supportsLedControl)} />
+                        <ReadOnlyField label="Buzzer Control" value={formatBooleanValue(currentDevice.gatewayProfile.supportsBuzzerControl)} />
+                        <ReadOnlyField label="Node-RED Ready" value={formatBooleanValue(currentDevice.gatewayProfile.nodeRedIntegrationReady)} />
+                        <ReadOnlyField label="MQTT Topic Example" value={currentDevice.gatewayProfile.mqttTopicExample} multiline />
+                        <ReadOnlyField label="MQTT Payload Example" value={currentDevice.gatewayProfile.mqttPayloadExample} multiline />
+                        <ReadOnlyField label="HTTPS Endpoint" value={currentDevice.gatewayProfile.httpsEndpoint} multiline />
+                        <ReadOnlyField label="WebSocket Endpoint" value={currentDevice.gatewayProfile.websocketEndpoint} multiline />
+                        <div className="sm:col-span-2">
+                          <ReadOnlyField label="Configuration Notes" value={currentDevice.gatewayProfile.configurableParameters} multiline />
+                        </div>
+                        <div className="sm:col-span-2">
+                          <ReadOnlyField label="Notes" value={currentDevice.gatewayProfile.notes} multiline />
+                        </div>
+                      </div>
+                      <ReadOnlyPillGroup label="Uplink Protocols" values={currentDevice.gatewayProfile.uplinkProtocols} />
+                    </div>
+                  ) : null}
+                </div>
+              )}
+
+              {activeTab === 'variants' && currentDevice.variants?.length ? <DeviceVariantComparison device={currentDevice} /> : null}
+
+              {activeTab === 'documents' && (
+                <section>
+                  <h4 className="text-sm font-semibold text-slate-900">Documents</h4>
+                  <div className="mt-3 space-y-3">
+                    {currentDevice.documents.length ? currentDevice.documents.map((document) => (
+                      <a key={`${document.label}-${document.path}`} href={toFileHref(document.path)} target="_blank" rel="noreferrer" className="block rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-700">
+                        <span className="block font-medium text-slate-950">{document.label}</span>
+                        <span className="mt-1 block break-all text-xs text-slate-500">{document.path}</span>
+                      </a>
+                    )) : <p className="text-sm text-slate-500">No documents mapped yet.</p>}
+                  </div>
+                </section>
+              )}
+            </>
+          ) : null}
         </>
       )}
+      </div>
 
+      {isEditing ? (
       <section className="mt-6">
         <h4 className="text-sm font-semibold text-slate-900">Documents</h4>
         <div className="mt-3 space-y-3">
@@ -438,6 +663,7 @@ function DeviceDetailPanel({
           )) : <p className="text-sm text-slate-500">No documents mapped yet.</p>}
         </div>
       </section>
+      ) : null}
     </aside>
   );
 }

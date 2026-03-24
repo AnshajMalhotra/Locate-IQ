@@ -15,6 +15,7 @@ export interface DeviceDocument {
 export interface DeviceSpecs {
   bluetoothVersion?: string;
   sensors?: string[];
+  batteryLifeEstimate?: string;
   wifiSupport: boolean;
   wifiBand?: string;
   ethernetSupport: boolean;
@@ -146,6 +147,7 @@ export interface DeviceSavePayload {
   specs: {
     bluetoothVersion: string;
     sensors: string;
+    batteryLifeEstimate: string;
     ipRating: string;
     backhaulType: string;
     powerSupply: string;
@@ -210,6 +212,7 @@ export const mockDevices: Device[] = [
       operatingTempMinC: -30,
       operatingTempMaxC: 70,
       batteryCapacity: '3000mAh backup battery',
+      batteryLifeEstimate: 'Externally powered',
       backhaulType: 'Cellular (CAT.1 / GSM) with GNSS / LBS support',
       indoorOutdoorRating: 'Outdoor (IP67)',
       installation: 'Hard-wired outdoor mounting',
@@ -275,6 +278,7 @@ export const mockDevices: Device[] = [
       dimensions: '180.7 x 180.7 x 40.7 mm',
       weight: '582g',
       powerSupply: 'PoE 48V or DC 12-30V',
+      batteryLifeEstimate: 'Externally powered',
       installation: 'Ceiling mount',
       material: 'ABS+PC',
       backhaulType: 'Ethernet',
@@ -325,6 +329,7 @@ export const mockDevices: Device[] = [
     specs: {
       bluetoothVersion: 'BLE 5.1+',
       sensors: ['3-axis accelerometer', 'temperature sensor', 'humidity sensor', 'hall-effect sensor'],
+      batteryLifeEstimate: '3-4 years',
       wifiSupport: false,
       ethernetSupport: false,
       poeSupport: false,
@@ -413,6 +418,7 @@ export const mockDevices: Device[] = [
       operatingTempMinC: -25,
       operatingTempMaxC: 135,
       batteryCapacity: 'Industrial CR2450 | 550mAh',
+      batteryLifeEstimate: 'Up to 3 years',
       replaceableBattery: false,
       dimensions: '60.3 x 32.2 x 12.0 mm',
       weight: '25g',
