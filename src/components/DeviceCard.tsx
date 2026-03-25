@@ -1,4 +1,4 @@
-import { Device } from '../data/mockDevices';
+import { Device, getDeviceUiCategoryLabel } from '../data/mockDevices';
 
 interface DeviceCardProps {
   device: Device;
@@ -15,65 +15,70 @@ function DeviceCard({ device, isSelected, onSelect }: DeviceCardProps) {
     device.variants?.length ? `${device.variants.length} variants` : undefined,
   ].filter(Boolean) as string[];
 
+  const categoryLabel = getDeviceUiCategoryLabel(device);
+
   return (
     <article
-      className={`rounded-[24px] border p-5 transition ${
+      className={`group rounded-[28px] border p-5 transition ${
         isSelected
-          ? 'border-emerald-500 bg-emerald-50/70 shadow-[0_24px_60px_-36px_rgba(5,150,105,0.45)]'
-          : 'border-slate-200 bg-white shadow-[0_18px_60px_-35px_rgba(15,23,42,0.32)] hover:-translate-y-0.5 hover:border-slate-300'
+          ? 'border-emerald-500/60 bg-slate-800/90 shadow-[0_24px_70px_-40px_rgba(16,185,129,0.35)]'
+          : 'border-slate-800 bg-slate-800/75 shadow-[0_22px_70px_-42px_rgba(2,6,23,0.95)] hover:-translate-y-0.5 hover:border-slate-700 hover:bg-slate-800/95'
       }`}
     >
       <div className="flex items-start justify-between gap-3">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">{device.category}</p>
-          <h3 className="mt-2 text-xl font-semibold text-slate-950">{device.title}</h3>
-          <p className="mt-1 text-sm text-slate-600">
-            {device.manufacturer}
-            {device.subcategory ? ` | ${device.subcategory}` : ''}
+        <div className="min-w-0">
+          <span className="inline-flex rounded-xl bg-emerald-500/12 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-300">
+            {categoryLabel}
+          </span>
+          <h3 className="mt-4 text-[1.65rem] font-semibold tracking-tight text-white">{device.title}</h3>
+          <p className="mt-2 text-sm text-slate-400">
+            <span className="font-medium text-slate-300">{device.manufacturer}</span>
+            {device.modelNumber ? <span>{`  •  ${device.modelNumber}`}</span> : null}
           </p>
         </div>
-        <span
-          className={`rounded-full px-3 py-1 text-xs font-semibold ${
-            device.status === 'active' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
-          }`}
-        >
+        <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
+          <span className={`h-2.5 w-2.5 rounded-full ${device.status === 'active' ? 'bg-emerald-400' : 'bg-amber-400'}`} />
           {device.status}
-        </span>
+        </div>
       </div>
 
-      <p className="mt-4 text-sm leading-6 text-slate-700">{device.description}</p>
+      <p className="mt-6 min-h-[72px] text-base leading-7 text-slate-300">{device.description}</p>
 
-      <div className="mt-4 flex flex-wrap gap-2">
+      <div className="mt-5 flex flex-wrap gap-2">
         {highlights.slice(0, 4).map((item) => (
-          <span key={item} className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
+          <span key={item} className="rounded-full border border-slate-700 bg-slate-900 px-3 py-1 text-xs font-medium text-slate-300">
             {item}
           </span>
         ))}
       </div>
 
-      <dl className="mt-5 grid grid-cols-2 gap-3 text-sm">
-        <div className="rounded-2xl bg-slate-50 p-3">
-          <dt className="text-xs uppercase tracking-[0.18em] text-slate-500">Protocols</dt>
-          <dd className="mt-2 font-medium text-slate-900">{device.protocolNames.slice(0, 3).join(', ') || 'Not mapped'}</dd>
+      <div className="mt-6 border-t border-slate-700/70 pt-4">
+        <div className="flex flex-wrap gap-2">
+          {device.connectivity.slice(0, 4).map((entry) => (
+            <span key={entry} className="rounded-md border border-slate-700 bg-[#0a1326] px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-200">
+              {entry}
+            </span>
+          ))}
+          {!device.connectivity.length ? (
+            <span className="rounded-md border border-slate-700 bg-[#0a1326] px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-500">
+              Unmapped
+            </span>
+          ) : null}
         </div>
-        <div className="rounded-2xl bg-slate-50 p-3">
-          <dt className="text-xs uppercase tracking-[0.18em] text-slate-500">Connectivity</dt>
-          <dd className="mt-2 font-medium text-slate-900">{device.connectivity.slice(0, 3).join(', ') || 'Not mapped'}</dd>
-        </div>
-      </dl>
+      </div>
 
       <div className="mt-5 flex flex-wrap gap-2">
         {device.applications.slice(0, 3).map((application) => (
-          <span key={application} className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700">
+          <span key={application} className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-300">
             {application}
           </span>
         ))}
       </div>
 
-      <div className="mt-5 flex flex-wrap gap-3">
+      <div className="mt-6 flex flex-wrap gap-3">
         <button
           type="button"
-          className="inline-flex items-center rounded-full bg-slate-950 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800"
+          className="inline-flex items-center rounded-full border border-slate-700 bg-slate-900 px-4 py-2 text-sm font-medium text-slate-100 transition hover:border-emerald-500/50 hover:text-emerald-200"
           onClick={() => onSelect(device)}
         >
           Open details
@@ -83,7 +88,7 @@ function DeviceCard({ device, isSelected, onSelect }: DeviceCardProps) {
             href={device.vendorProductUrl}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
+            className="inline-flex items-center rounded-full border border-slate-700 px-4 py-2 text-sm font-medium text-slate-300 transition hover:border-slate-600 hover:bg-slate-900"
           >
             Vendor page
           </a>

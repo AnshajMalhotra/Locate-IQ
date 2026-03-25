@@ -1,10 +1,12 @@
 import { useCallback, useDeferredValue, useEffect, useState } from 'react';
 
 import DeviceCard from './components/DeviceCard';
+import CommandBar from './components/CommandBar';
 import DeviceDetailPanel from './components/DeviceDetailPanel';
 import FilterSidebar from './components/FilterSidebar';
-import SearchBar from './components/SearchBar';
-import { Device, DeviceDocument, DeviceOption, DeviceProtocol, DeviceSavePayload, mockDevices } from './data/mockDevices';
+import HardwareSearch from './components/HardwareSearch';
+import Sidebar from './components/Sidebar';
+import { Device, DeviceDocument, DeviceOption, DeviceProtocol, DeviceSavePayload, getDeviceUiCategory, getDeviceUiCategoryLabel, mockDevices } from './data/mockDevices';
 import './App.css';
 
 type ConnectionStatus = 'idle' | 'checking' | 'connected' | 'failed';
@@ -64,6 +66,9 @@ const tableIds = {
   anchorProfiles: 'm2w2nv5ygb0nz0t',
   deviceVariants: 'msmzgfblv22rlkh',
 };
+
+const MERGED_WIRED_CONNECTIVITY_KEY = 'conn_ethernet_poe';
+const MERGED_WIRED_CONNECTIVITY_LABEL = 'Ethernet / PoE';
 
 function uniqueSorted(values: Array<string | undefined | null>) {
   return [...new Set(values.filter((value): value is string => Boolean(value && value.trim())).map((value) => value.trim()))].sort((a, b) =>
@@ -157,14 +162,32 @@ function buildProtocolOptions(rows: NocoRow[]) {
 }
 
 function buildConnectivityOptions(rows: NocoRow[]) {
-  return rows
+  const options = rows
     .map((row): DeviceOption | null => {
       const key = getRowString(row, 'connectivity_key');
-      const label = getRowString(row, 'connectivity_type');
-      return key && label ? { key, label } : null;
+      const rawLabel = getRowString(row, 'connectivity_type');
+      const label = rawLabel === 'Ethernet RJ45' || rawLabel === 'PoE' || rawLabel === 'Ethernet' ? MERGED_WIRED_CONNECTIVITY_LABEL : rawLabel;
+      const normalizedKey = rawLabel === 'Ethernet RJ45' || rawLabel === 'PoE' || rawLabel === 'Ethernet' ? MERGED_WIRED_CONNECTIVITY_KEY : key;
+
+      return normalizedKey && label ? { key: normalizedKey, label } : null;
     })
-    .filter((value): value is DeviceOption => Boolean(value))
+    .filter((value): value is DeviceOption => Boolean(value));
+
+  return [...new Map(options.map((option) => [option.key, option])).values()]
     .sort((a, b) => a.label.localeCompare(b.label));
+}
+
+function normalizeConnectivityLabel(value: string) {
+  const trimmed = value.trim();
+  if (!trimmed) return '';
+  if (trimmed === 'Ethernet RJ45' || trimmed === 'PoE' || trimmed === 'Ethernet') {
+    return MERGED_WIRED_CONNECTIVITY_LABEL;
+  }
+  return trimmed;
+}
+
+function normalizeConnectivityKeysForSave(selectedKeys: string[]) {
+  return [...new Set(selectedKeys.map((key) => (key === 'conn_eth' || key === 'conn_poe' ? MERGED_WIRED_CONNECTIVITY_KEY : key)))];
 }
 
 function splitMultilineField(value: string) {
@@ -203,31 +226,6 @@ function getBatteryLifeLabel(device: Device) {
   return device.specs.batteryLifeEstimate?.trim() || inferBatteryLifeEstimate(device.specs) || 'Not mapped';
 }
 
-function countActiveFilters(filters: FilterState) {
-  const multiCount =
-    filters.categories.length +
-    filters.manufacturers.length +
-    filters.applications.length +
-    filters.protocols.length +
-    filters.connectivity.length +
-    filters.tags.length +
-    filters.batteryLife.length +
-    filters.ipRatings.length +
-    filters.edgeModes.length +
-    filters.status.length;
-
-  const booleanCount = [
-    filters.requirePoe,
-    filters.requireEthernet,
-    filters.requireWifi,
-    filters.requireCellular,
-    filters.requireGnss,
-    filters.requireLocalCompute,
-  ].filter(Boolean).length;
-
-  return multiCount + booleanCount;
-}
-
 function normalizeSearchTerms(query: string) {
   const ignored = new Set(['a', 'an', 'and', 'by', 'for', 'from', 'in', 'into', 'of', 'on', 'or', 'the', 'to', 'with']);
 
@@ -251,6 +249,7 @@ function createEmptyDeviceDraft(): DeviceSavePayload {
     description: '',
     vendorProductUrl: '',
     datasheetPath: '',
+    tags: [],
     specs: {
       bluetoothVersion: '',
       sensors: '',
@@ -281,18 +280,6 @@ function createEmptyDeviceDraft(): DeviceSavePayload {
       notes: '',
     },
   };
-}
-
-function normalizeFileHref(path: string) {
-  if (path.startsWith('\\\\')) {
-    return `file:${path.replace(/\\/g, '/')}`;
-  }
-
-  if (/^[A-Za-z]:\\/.test(path)) {
-    return `file:///${path.replace(/\\/g, '/')}`;
-  }
-
-  return path;
 }
 
 function matchesQuery(device: Device, query: string) {
@@ -516,10 +503,12 @@ function mapRowsToDevices(rows: {
     const connectivity = uniqueSorted(
       (connectivityLinks[deviceKey] ?? []).map(
         (link) =>
-          getLinkedTitle(link.connectivity_ref) ??
-          (getRowString(connectivityById.get(getLinkedId(link.connectivity_ref) ?? String(link.nc_24rw___connectivity_options_id ?? '')) ?? {}, 'connectivity_type') ||
-            getRowString(connectivityByKey.get(getRowString(link, 'connectivity_key')) ?? {}, 'connectivity_type') ||
-            getRowString(link, 'details')),
+          normalizeConnectivityLabel(
+            getLinkedTitle(link.connectivity_ref) ??
+              (getRowString(connectivityById.get(getLinkedId(link.connectivity_ref) ?? String(link.nc_24rw___connectivity_options_id ?? '')) ?? {}, 'connectivity_type') ||
+                getRowString(connectivityByKey.get(getRowString(link, 'connectivity_key')) ?? {}, 'connectivity_type') ||
+                getRowString(link, 'details')),
+          ),
       ),
     );
 
@@ -550,6 +539,8 @@ function mapRowsToDevices(rows: {
       path,
     }));
 
+    const category = ((getRowString(deviceRow, 'category') || 'gateway') as Device['category']);
+
     return {
       id: String(deviceRow.Id ?? index + 1),
       key: deviceKey,
@@ -557,7 +548,7 @@ function mapRowsToDevices(rows: {
       deviceName: getRowString(deviceRow, 'device_name') || getRowString(deviceRow, 'title') || 'Unnamed Device',
       modelNumber: getRowString(deviceRow, 'model_number'),
       manufacturer: getRowString(deviceRow, 'manufacturer') || 'Unknown',
-      category: ((getRowString(deviceRow, 'category') || 'gateway') as Device['category']),
+      category,
       subcategory: getRowString(deviceRow, 'subcategory'),
       role: getRowString(deviceRow, 'role'),
       status: getRowString(deviceRow, 'status') || 'active',
@@ -606,7 +597,7 @@ function mapRowsToDevices(rows: {
         maxSignalRangeOpenSpace: getRowString(specs, 'max_signal_range_open_space'),
         maxSignalRangeRealWorld: getRowString(specs, 'max_signal_range_real_world'),
       },
-      gatewayProfile: gatewayProfileRow
+      gatewayProfile: category === 'gateway' && gatewayProfileRow
         ? {
             payloadFormat: getRowString(gatewayProfileRow, 'payload_format'),
             uplinkProtocols: uniqueSorted(
@@ -637,7 +628,7 @@ function mapRowsToDevices(rows: {
             notes: getRowString(gatewayProfileRow, 'notes'),
           }
         : undefined,
-      anchorProfile: anchorProfileRow
+      anchorProfile: category === 'anchor' && anchorProfileRow
         ? {
             positioningTechnology: getRowString(anchorProfileRow, 'positioning_technology'),
             positioningAccuracy: getRowString(anchorProfileRow, 'positioning_accuracy'),
@@ -669,7 +660,7 @@ function App() {
   const [devices, setDevices] = useState<Device[]>(mockDevices);
   const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState<FilterState>(defaultFilters);
-  const [selectedDeviceKey, setSelectedDeviceKey] = useState<string | null>(mockDevices[0]?.key ?? null);
+  const [selectedDeviceKey, setSelectedDeviceKey] = useState<string | null>(null);
   const [newDeviceDraft, setNewDeviceDraft] = useState<DeviceSavePayload | null>(null);
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>('idle');
   const [connectionError, setConnectionError] = useState<string | null>(null);
@@ -681,14 +672,14 @@ function App() {
   ]);
   const [connectivityOptions, setConnectivityOptions] = useState<DeviceOption[]>([
     { key: 'conn_ble', label: 'BLE' },
-    { key: 'conn_eth', label: 'Ethernet RJ45' },
-    { key: 'conn_poe', label: 'PoE' },
+    { key: MERGED_WIRED_CONNECTIVITY_KEY, label: MERGED_WIRED_CONNECTIVITY_LABEL },
     { key: 'conn_cellular', label: 'Cellular' },
     { key: 'conn_gnss', label: 'GNSS' },
   ]);
   const [saveState, setSaveState] = useState<SaveState>('idle');
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const [isAdvancedFilterOpen, setIsAdvancedFilterOpen] = useState(false);
+  const [businessTagOptions, setBusinessTagOptions] = useState<string[]>(uniqueSorted(mockDevices.flatMap((device) => device.tags)));
 
   const deferredSearchQuery = useDeferredValue(searchQuery);
   const baseUrl = import.meta.env.VITE_NOCODB_BASE_URL;
@@ -756,14 +747,16 @@ function App() {
       setDevices(normalizedDevices);
       setProtocolOptions(buildProtocolOptions(protocolRows));
       setConnectivityOptions(buildConnectivityOptions(connectivityRows));
-      setSelectedDeviceKey((current) => normalizedDevices.find((device) => device.key === current)?.key ?? normalizedDevices[0]?.key ?? null);
+      setBusinessTagOptions(uniqueSorted((tagRows as NocoRow[]).map((row: NocoRow) => getRowString(row, 'tag_name')).filter(Boolean)));
+      setSelectedDeviceKey((current) => normalizedDevices.find((device) => device.key === current)?.key ?? null);
       setConnectionStatus('connected');
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       setConnectionStatus('failed');
       setConnectionError(`Failed to load linked NocoDB tables. ${message}`);
       setDevices(mockDevices);
-      setSelectedDeviceKey(mockDevices[0]?.key ?? null);
+      setBusinessTagOptions(uniqueSorted(mockDevices.flatMap((device) => device.tags)));
+      setSelectedDeviceKey(null);
     }
   }, [apiKey, baseUrl]);
 
@@ -773,7 +766,7 @@ function App() {
 
   const filteredDevices = devices.filter((device) => {
     if (!matchesQuery(device, deferredSearchQuery)) return false;
-    if (filters.categories.length && !filters.categories.includes(device.category)) return false;
+    if (filters.categories.length && !filters.categories.includes(getDeviceUiCategoryLabel(device))) return false;
     if (filters.manufacturers.length && !filters.manufacturers.includes(device.manufacturer)) return false;
     if (filters.status.length && !filters.status.includes(device.status)) return false;
     if (filters.batteryLife.length && !filters.batteryLife.includes(getBatteryLifeLabel(device))) return false;
@@ -793,13 +786,10 @@ function App() {
     return true;
   });
 
-  const selectedDevice =
-    filteredDevices.find((device) => device.key === selectedDeviceKey) ??
-    filteredDevices[0] ??
-    null;
+  const selectedDevice = selectedDeviceKey ? filteredDevices.find((device) => device.key === selectedDeviceKey) ?? null : null;
 
   const filterOptions = {
-    categories: uniqueSorted(devices.map((device) => device.category)),
+    categories: uniqueSorted(devices.map((device) => getDeviceUiCategoryLabel(device))),
     manufacturers: uniqueSorted(devices.map((device) => device.manufacturer)),
     applications: uniqueSorted(devices.flatMap((device) => device.applications)),
     protocols: uniqueSorted(devices.flatMap((device) => device.protocolNames)),
@@ -811,7 +801,6 @@ function App() {
     statuses: uniqueSorted(devices.map((device) => device.status)),
   };
 
-  const activeFilterCount = countActiveFilters(filters);
   const selectedFilterChips = [
     ...filters.categories.map((value) => ({ key: `categories:${value}`, label: `Category: ${value}` })),
     ...filters.connectivity.map((value) => ({ key: `connectivity:${value}`, label: `Connectivity: ${value}` })),
@@ -829,8 +818,18 @@ function App() {
     total: devices.length,
     gateways: devices.filter((device) => device.category === 'gateway').length,
     anchors: devices.filter((device) => device.category === 'anchor').length,
+    tags: devices.filter((device) => getDeviceUiCategory(device) === 'tag').length,
+    beacons: devices.filter((device) => getDeviceUiCategory(device) === 'beacon').length,
     protocols: uniqueSorted(devices.flatMap((device) => device.protocolNames)).length,
   };
+
+  const inventoryRailItems = [
+    { key: 'all', label: 'All Devices', count: stats.total, active: !filters.categories.length, onClick: () => setSingleFilter('categories', '') },
+    { key: 'gateway', label: 'Gateways', count: stats.gateways, active: filters.categories[0] === 'Gateway', onClick: () => setSingleFilter('categories', 'Gateway') },
+    { key: 'anchor', label: 'Anchors', count: stats.anchors, active: filters.categories[0] === 'Anchor', onClick: () => setSingleFilter('categories', 'Anchor') },
+    { key: 'tag', label: 'Tags', count: stats.tags, active: filters.categories[0] === 'Tag', onClick: () => setSingleFilter('categories', 'Tag') },
+    { key: 'beacon', label: 'Beacons', count: stats.beacons, active: filters.categories[0] === 'Beacon', onClick: () => setSingleFilter('categories', 'Beacon') },
+  ];
 
   function toggleMulti(key: keyof FilterState, value: string) {
     setFilters((current) => {
@@ -892,6 +891,11 @@ function App() {
     setSaveMessage(null);
   }
 
+  function applySidebarCategory(value: string) {
+    setSingleFilter('categories', value);
+    setSelectedDeviceKey(null);
+  }
+
   async function handleSaveDeviceEdits(device: Device, payload: DeviceSavePayload) {
     if (!baseUrl || !apiKey) {
       throw new Error('NocoDB credentials are missing. Writes are disabled.');
@@ -902,7 +906,7 @@ function App() {
 
     try {
       const normalizedBaseUrl = baseUrl.replace(/\/$/, '');
-      const [deviceRows, specRows, gatewayRows, anchorRows, protocolRows, connectivityRows, deviceProtocolRows, deviceConnectivityRows] =
+      const [deviceRows, specRows, gatewayRows, anchorRows, protocolRows, connectivityRows, tagRows, deviceProtocolRows, deviceConnectivityRows, deviceTagRows] =
         await Promise.all([
           fetchTable(normalizedBaseUrl, apiKey, tableIds.devices),
           fetchTable(normalizedBaseUrl, apiKey, tableIds.deviceSpecs),
@@ -910,8 +914,10 @@ function App() {
           fetchTable(normalizedBaseUrl, apiKey, tableIds.anchorProfiles),
           fetchTable(normalizedBaseUrl, apiKey, tableIds.protocols),
           fetchTable(normalizedBaseUrl, apiKey, tableIds.connectivityOptions),
+          fetchTable(normalizedBaseUrl, apiKey, tableIds.businessTags),
           fetchTable(normalizedBaseUrl, apiKey, tableIds.deviceProtocols),
           fetchTable(normalizedBaseUrl, apiKey, tableIds.deviceConnectivity),
+          fetchTable(normalizedBaseUrl, apiKey, tableIds.deviceTags),
         ]);
 
       const deviceRow = (deviceRows as NocoRow[]).find((row: NocoRow) => getRowString(row, 'device_key') === device.key);
@@ -926,6 +932,7 @@ function App() {
           device_name: payload.title,
           manufacturer: payload.manufacturer,
           model_number: payload.modelNumber,
+          category: payload.category,
           subcategory: payload.subcategory,
           role: payload.role,
           status: payload.status,
@@ -998,8 +1005,10 @@ function App() {
 
       const protocolByKey = new Map((protocolRows as NocoRow[]).map((row: NocoRow) => [getRowString(row, 'protocol_key'), row]));
       const connectivityByKey = new Map((connectivityRows as NocoRow[]).map((row: NocoRow) => [getRowString(row, 'connectivity_key'), row]));
+      const businessTagByLabel = new Map((tagRows as NocoRow[]).map((row: NocoRow) => [getRowString(row, 'tag_name'), row]));
       const existingProtocolRows = (deviceProtocolRows as NocoRow[]).filter((row: NocoRow) => getRowString(row, 'device_key') === device.key);
       const existingConnectivityRows = (deviceConnectivityRows as NocoRow[]).filter((row: NocoRow) => getRowString(row, 'device_key') === device.key);
+      const existingTagRows = (deviceTagRows as NocoRow[]).filter((row: NocoRow) => getRowString(row, 'device_key') === device.key);
 
       if (existingProtocolRows.length) {
         await deleteRecords(
@@ -1038,7 +1047,7 @@ function App() {
         );
       }
 
-      const nextConnectivityRows = payload.connectivityKeys
+      const nextConnectivityRows = normalizeConnectivityKeysForSave(payload.connectivityKeys)
         .filter(Boolean)
         .map((connectivityKey) => {
           const connectivityRow = connectivityByKey.get(connectivityKey);
@@ -1055,6 +1064,36 @@ function App() {
 
       if (nextConnectivityRows.length) {
         await createRecords(normalizedBaseUrl, apiKey, tableIds.deviceConnectivity, nextConnectivityRows);
+      }
+
+      if (existingTagRows.length) {
+        await deleteRecords(
+          normalizedBaseUrl,
+          apiKey,
+          tableIds.deviceTags,
+          existingTagRows.map((row: NocoRow) => ({ Id: getRowNumber(row, 'Id') })),
+        );
+      }
+
+      const nextTagRows: NocoRow[] = payload.tags
+        .filter(Boolean)
+        .flatMap((tagLabel) => {
+          const tagRow = businessTagByLabel.get(tagLabel);
+          if (!tagRow) return [];
+
+          return [
+            {
+              title: `${device.key} | ${getRowString(tagRow, 'tag_key') || tagLabel}`,
+              device_key: device.key,
+              tag_key: getRowString(tagRow, 'tag_key'),
+              nc_24rw___devices_id: Number(device.id),
+              nc_24rw___business_tags_id: getRowNumber(tagRow, 'Id'),
+            },
+          ];
+        });
+
+      if (nextTagRows.length) {
+        await createRecords(normalizedBaseUrl, apiKey, tableIds.deviceTags, nextTagRows);
       }
 
       await loadDataset();
@@ -1087,10 +1126,11 @@ function App() {
 
     try {
       const normalizedBaseUrl = baseUrl.replace(/\/$/, '');
-      const [deviceRows, protocolRows, connectivityRows] = await Promise.all([
+      const [deviceRows, protocolRows, connectivityRows, tagRows] = await Promise.all([
         fetchTable(normalizedBaseUrl, apiKey, tableIds.devices),
         fetchTable(normalizedBaseUrl, apiKey, tableIds.protocols),
         fetchTable(normalizedBaseUrl, apiKey, tableIds.connectivityOptions),
+        fetchTable(normalizedBaseUrl, apiKey, tableIds.businessTags),
       ]);
 
       const existingDevice = (deviceRows as NocoRow[]).find((row: NocoRow) => getRowString(row, 'device_key') === payload.key.trim());
@@ -1169,6 +1209,7 @@ function App() {
 
       const protocolByKey = new Map((protocolRows as NocoRow[]).map((row: NocoRow) => [getRowString(row, 'protocol_key'), row]));
       const connectivityByKey = new Map((connectivityRows as NocoRow[]).map((row: NocoRow) => [getRowString(row, 'connectivity_key'), row]));
+      const businessTagByLabel = new Map((tagRows as NocoRow[]).map((row: NocoRow) => [getRowString(row, 'tag_name'), row]));
 
       const nextProtocolRows = payload.protocols
         .filter((protocol) => protocol.protocolKey)
@@ -1189,7 +1230,7 @@ function App() {
         await createRecords(normalizedBaseUrl, apiKey, tableIds.deviceProtocols, nextProtocolRows);
       }
 
-      const nextConnectivityRows = payload.connectivityKeys
+      const nextConnectivityRows = normalizeConnectivityKeysForSave(payload.connectivityKeys)
         .filter(Boolean)
         .map((connectivityKey) => {
           const connectivityRow = connectivityByKey.get(connectivityKey);
@@ -1205,6 +1246,27 @@ function App() {
 
       if (nextConnectivityRows.length) {
         await createRecords(normalizedBaseUrl, apiKey, tableIds.deviceConnectivity, nextConnectivityRows);
+      }
+
+      const nextTagRows: NocoRow[] = payload.tags
+        .filter(Boolean)
+        .flatMap((tagLabel) => {
+          const tagRow = businessTagByLabel.get(tagLabel);
+          if (!tagRow) return [];
+
+          return [
+            {
+              title: `${payload.key.trim()} | ${getRowString(tagRow, 'tag_key') || tagLabel}`,
+              device_key: payload.key.trim(),
+              tag_key: getRowString(tagRow, 'tag_key'),
+              nc_24rw___devices_id: createdDeviceId,
+              nc_24rw___business_tags_id: getRowNumber(tagRow, 'Id'),
+            },
+          ];
+        });
+
+      if (nextTagRows.length) {
+        await createRecords(normalizedBaseUrl, apiKey, tableIds.deviceTags, nextTagRows);
       }
 
       await loadDataset();
@@ -1223,161 +1285,158 @@ function App() {
   return (
     <div className="app-shell min-h-screen">
       <div className="app-noise" aria-hidden="true" />
-      <header className="relative border-b border-white/40 px-5 py-6 sm:px-8">
-        <div className="mx-auto flex max-w-[1540px] flex-col gap-6">
-          <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-emerald-800">Locate-IQ</p>
-              <h1 className="mt-3 max-w-4xl text-4xl font-semibold tracking-tight text-slate-950 sm:text-5xl">
-                Internal hardware selection cockpit for gateways, anchors, and tags
-              </h1>
-              <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-700 sm:text-base">
-                Deterministic product selection for pre-sales and portfolio onboarding. The UI now reads your relational
-                NocoDB structure so teams can filter by hard specs, protocol stack, and deployment logic instead of browsing PDFs manually.
-              </p>
-            </div>
+      <Sidebar
+        connectionStatus={connectionStatus}
+        items={inventoryRailItems.map((item) => ({
+          ...item,
+          onClick: () => applySidebarCategory(item.key === 'all' ? '' : item.label.slice(0, -1)),
+        }))}
+      />
 
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-              <div className="rounded-[24px] border border-white/70 bg-white/75 px-4 py-4 shadow-[0_18px_60px_-35px_rgba(15,23,42,0.35)] backdrop-blur">
-                <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Devices</p>
-                <p className="mt-2 text-2xl font-semibold text-slate-950">{stats.total}</p>
-              </div>
-              <div className="rounded-[24px] border border-white/70 bg-white/75 px-4 py-4 shadow-[0_18px_60px_-35px_rgba(15,23,42,0.35)] backdrop-blur">
-                <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Gateways</p>
-                <p className="mt-2 text-2xl font-semibold text-slate-950">{stats.gateways}</p>
-              </div>
-              <div className="rounded-[24px] border border-white/70 bg-white/75 px-4 py-4 shadow-[0_18px_60px_-35px_rgba(15,23,42,0.35)] backdrop-blur">
-                <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Anchors</p>
-                <p className="mt-2 text-2xl font-semibold text-slate-950">{stats.anchors}</p>
-              </div>
-              <div className="rounded-[24px] border border-white/70 bg-white/75 px-4 py-4 shadow-[0_18px_60px_-35px_rgba(15,23,42,0.35)] backdrop-blur">
-                <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Protocols</p>
-                <p className="mt-2 text-2xl font-semibold text-slate-950">{stats.protocols}</p>
-              </div>
-            </div>
+      <CommandBar
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        stats={{
+          devices: stats.total,
+          gateways: stats.gateways,
+          anchors: stats.anchors,
+          tags: stats.tags,
+          beacons: stats.beacons,
+        }}
+        onOpenAdvancedFilters={() => setIsAdvancedFilterOpen(true)}
+        onAddDevice={startCreateDevice}
+        canAddDevice={canEditDatabase}
+      />
+
+      <main className="min-h-screen pt-20 xl:pl-64">
+        <div className="mx-auto max-w-[1680px] px-5 pb-8 xl:px-8">
+          <div className="mb-6">
+            <h1 className="text-2xl font-bold text-slate-100">Hardware Inventory</h1>
+            <p className="mt-2 text-sm font-mono text-slate-400">
+              {filteredDevices.length} items found
+              {filters.categories[0] ? ` in ${filters.categories[0]}` : ''}
+            </p>
           </div>
 
-          <div className="flex flex-col gap-3 text-sm sm:flex-row sm:items-center sm:justify-between">
-            <div className="text-slate-700">
-              Source: <span className="font-medium text-slate-950">Linked NocoDB tables</span>
-            </div>
-            <div className="rounded-full border border-white/60 bg-white/70 px-4 py-2 font-medium text-slate-700 backdrop-blur">
-              {connectionStatus === 'checking' && 'Checking NocoDB connection...'}
-              {connectionStatus === 'connected' && 'NocoDB connected'}
-              {connectionStatus === 'failed' && 'NocoDB failed, using fallback'}
-              {connectionStatus === 'idle' && 'Using local fallback data'}
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <main className="relative mx-auto grid max-w-[1540px] gap-6 px-5 py-8 lg:grid-cols-[minmax(0,1fr)_400px] lg:px-8">
-        <section className="space-y-6">
-          <SearchBar
-            value={searchQuery}
-            onChange={setSearchQuery}
-            resultCount={filteredDevices.length}
-            totalCount={devices.length}
-            canAddDevice={canEditDatabase}
-            onAddDevice={startCreateDevice}
-            categoryOptions={filterOptions.categories}
+          <HardwareSearch
             connectivityOptions={filterOptions.connectivity}
-            applicationOptions={filterOptions.applications}
-            batteryLifeOptions={filterOptions.batteryLife}
+            batteryOptions={filterOptions.batteryLife}
+            useCaseOptions={filterOptions.applications}
             statusOptions={filterOptions.statuses}
-            selectedCategory={filters.categories[0] ?? ''}
             selectedConnectivity={filters.connectivity[0] ?? ''}
-            selectedApplication={filters.applications[0] ?? ''}
-            selectedBatteryLife={filters.batteryLife[0] ?? ''}
+            selectedBattery={filters.batteryLife[0] ?? ''}
+            selectedUseCase={filters.applications[0] ?? ''}
             selectedStatus={filters.status[0] ?? ''}
-            onCategoryChange={(value) => setSingleFilter('categories', value)}
             onConnectivityChange={(value) => setSingleFilter('connectivity', value)}
-            onApplicationChange={(value) => setSingleFilter('applications', value)}
-            onBatteryLifeChange={(value) => setSingleFilter('batteryLife', value)}
+            onBatteryChange={(value) => setSingleFilter('batteryLife', value)}
+            onUseCaseChange={(value) => setSingleFilter('applications', value)}
             onStatusChange={(value) => setSingleFilter('status', value)}
-            onOpenAdvancedFilters={() => setIsAdvancedFilterOpen(true)}
-            activeFilterCount={activeFilterCount}
             selectedFilters={selectedFilterChips}
             onRemoveFilter={removeSelectedFilter}
             onResetFilters={resetFilters}
           />
 
-          {connectionError && (
-            <div className="rounded-[24px] border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          {connectionError ? (
+            <div className="mt-6 rounded-xl border border-amber-500/25 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
               {connectionError}
             </div>
-          )}
-
-          <div className="grid gap-5 xl:grid-cols-2">
-            {filteredDevices.map((device) => (
-              <DeviceCard
-                key={device.key}
-                device={device}
-                isSelected={selectedDevice?.key === device.key}
-                onSelect={(selected) => setSelectedDeviceKey(selected.key)}
-              />
-            ))}
-          </div>
-
-          {!filteredDevices.length && (
-            <div className="rounded-[28px] border border-dashed border-slate-300 bg-white/70 p-10 text-center shadow-[0_18px_60px_-35px_rgba(15,23,42,0.25)]">
-              <h3 className="text-xl font-semibold text-slate-950">No exact match yet</h3>
-              <p className="mt-3 text-sm leading-6 text-slate-600">
-                Relax one hard requirement or widen the text search to inspect near-fit devices and then refine the DB logic if needed.
-              </p>
-            </div>
-          )}
-        </section>
-
-        <div className="lg:sticky lg:top-6 lg:self-start">
-          <DeviceDetailPanel
-            key={newDeviceDraft ? 'new-device' : selectedDevice?.key ?? 'empty'}
-            device={selectedDevice}
-            newDeviceDraft={newDeviceDraft}
-            canEditDatabase={canEditDatabase}
-            protocolOptions={protocolOptions}
-            connectivityOptions={connectivityOptions}
-            saveState={saveState}
-            saveMessage={saveMessage}
-            onCreateDraft={startCreateDevice}
-            onCancelCreate={cancelCreateDevice}
-            onSave={handleSaveDeviceEdits}
-            onCreate={handleCreateDevice}
-          />
-          {selectedDevice?.documents.length ? (
-            <div className="mt-4 rounded-[24px] border border-slate-200 bg-white/85 p-4 text-xs text-slate-500 shadow-[0_18px_60px_-35px_rgba(15,23,42,0.32)] backdrop-blur">
-              Quick open:
-              <div className="mt-2 flex flex-wrap gap-2">
-                {selectedDevice.documents.map((document) => (
-                  <a
-                    key={document.path}
-                    href={normalizeFileHref(document.path)}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700 transition hover:bg-slate-200"
-                  >
-                    {document.label}
-                  </a>
-                ))}
-              </div>
-            </div>
           ) : null}
+
+          <div className="mt-6 flex items-start gap-6">
+            <section
+              className={`grid flex-1 grid-cols-1 gap-5 md:grid-cols-2 ${
+                selectedDevice || newDeviceDraft ? '2xl:grid-cols-2' : '2xl:grid-cols-3'
+              }`}
+            >
+              {filteredDevices.map((device) => (
+                <DeviceCard
+                  key={device.key}
+                  device={device}
+                  isSelected={selectedDevice?.key === device.key}
+                  onSelect={(selected) => setSelectedDeviceKey(selected.key)}
+                />
+              ))}
+
+              {!filteredDevices.length && (
+                <div className="col-span-full rounded-xl border border-dashed border-slate-700 bg-slate-800/30 p-12 text-center">
+                  <p className="mb-4 text-sm font-mono text-slate-400">No hardware matches current query parameters.</p>
+                  <button
+                    type="button"
+                    onClick={resetFilters}
+                    className="text-sm font-medium text-emerald-400 transition hover:text-emerald-300"
+                  >
+                    [ Reset Filters ]
+                  </button>
+                </div>
+              )}
+            </section>
+
+            {selectedDevice || newDeviceDraft ? (
+              <div className="hidden w-[420px] shrink-0 lg:block">
+                <DeviceDetailPanel
+                  key={newDeviceDraft ? 'new-device' : selectedDevice?.key ?? 'empty'}
+                  device={selectedDevice}
+                  newDeviceDraft={newDeviceDraft}
+                  canEditDatabase={canEditDatabase}
+                protocolOptions={protocolOptions}
+                connectivityOptions={connectivityOptions}
+                tagOptions={businessTagOptions}
+                saveState={saveState}
+                saveMessage={saveMessage}
+                  onCreateDraft={startCreateDevice}
+                  onCancelCreate={cancelCreateDevice}
+                  onSave={handleSaveDeviceEdits}
+                  onCreate={handleCreateDevice}
+                  onClose={() => {
+                    setSelectedDeviceKey(null);
+                    setNewDeviceDraft(null);
+                  }}
+                />
+              </div>
+            ) : null}
+          </div>
         </div>
       </main>
+
+      {(selectedDevice || newDeviceDraft) && (
+        <div className="fixed inset-0 z-40 bg-slate-950/80 backdrop-blur-sm lg:hidden">
+          <div className="ml-auto h-full w-full max-w-md border-l border-slate-700 bg-slate-900 shadow-2xl">
+            <DeviceDetailPanel
+              key={newDeviceDraft ? 'mobile-new-device' : selectedDevice?.key ?? 'mobile-empty'}
+              device={selectedDevice}
+              newDeviceDraft={newDeviceDraft}
+              canEditDatabase={canEditDatabase}
+              protocolOptions={protocolOptions}
+              connectivityOptions={connectivityOptions}
+              tagOptions={businessTagOptions}
+              saveState={saveState}
+              saveMessage={saveMessage}
+              onCreateDraft={startCreateDevice}
+              onCancelCreate={cancelCreateDevice}
+              onSave={handleSaveDeviceEdits}
+              onCreate={handleCreateDevice}
+              onClose={() => {
+                setSelectedDeviceKey(null);
+                setNewDeviceDraft(null);
+              }}
+            />
+          </div>
+        </div>
+      )}
 
       {isAdvancedFilterOpen ? (
         <div className="fixed inset-0 z-50 flex justify-end bg-slate-950/35 backdrop-blur-sm">
           <button type="button" aria-label="Close advanced filters" className="flex-1 cursor-default" onClick={() => setIsAdvancedFilterOpen(false)} />
-          <div className="flex h-full w-full max-w-[420px] flex-col border-l border-slate-200 bg-white p-5 shadow-[-24px_0_60px_-35px_rgba(15,23,42,0.45)]">
+          <div className="flex h-full w-full max-w-[420px] flex-col border-l border-slate-800 bg-[#08101f] p-5 shadow-[-24px_0_60px_-35px_rgba(2,6,23,0.9)]">
             <div className="mb-4 flex items-center justify-between gap-3">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Advanced Filters</p>
-                <h3 className="mt-1 text-xl font-semibold text-slate-950">Refine the shortlist</h3>
+                <h3 className="mt-1 text-xl font-semibold text-slate-100">Refine the shortlist</h3>
               </div>
               <button
                 type="button"
                 onClick={() => setIsAdvancedFilterOpen(false)}
-                className="rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-300 hover:text-slate-950"
+                className="rounded-full border border-slate-700 px-4 py-2 text-sm font-medium text-slate-300 transition hover:border-slate-600 hover:text-white"
               >
                 Close
               </button>

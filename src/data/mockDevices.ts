@@ -1,4 +1,5 @@
 export type DeviceCategory = 'gateway' | 'anchor' | 'beacon';
+export type DeviceUiCategory = 'gateway' | 'anchor' | 'tag' | 'beacon';
 
 export interface DeviceProtocol {
   key?: string;
@@ -144,6 +145,7 @@ export interface DeviceSavePayload {
   description: string;
   vendorProductUrl: string;
   datasheetPath: string;
+  tags: string[];
   specs: {
     bluetoothVersion: string;
     sensors: string;
@@ -173,6 +175,35 @@ export interface DeviceSavePayload {
     commissioningNotes: string;
     notes: string;
   };
+}
+
+export function getDeviceUiCategory(device: Pick<Device, 'category' | 'title' | 'deviceName' | 'modelNumber' | 'subcategory' | 'role' | 'tags'>): DeviceUiCategory {
+  if (device.category !== 'beacon') {
+    return device.category;
+  }
+
+  const categoryText = [
+    device.title,
+    device.deviceName,
+    device.modelNumber,
+    device.subcategory,
+    device.role,
+    ...device.tags,
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
+
+  return /\btag\b/.test(categoryText) ? 'tag' : 'beacon';
+}
+
+export function getDeviceUiCategoryLabel(device: Pick<Device, 'category' | 'title' | 'deviceName' | 'modelNumber' | 'subcategory' | 'role' | 'tags'>) {
+  const category = getDeviceUiCategory(device);
+
+  if (category === 'gateway') return 'Gateway';
+  if (category === 'anchor') return 'Anchor';
+  if (category === 'tag') return 'Tag';
+  return 'Beacon';
 }
 
 export const mockDevices: Device[] = [
@@ -255,7 +286,7 @@ export const mockDevices: Device[] = [
     datasheetPath: '\\\\192.168.0.254\\file\\02_Partners\\MOKO (BLE AoA Hardware)\\AOA products\\AoA Locator\\MKBAL-C25-P AoA Locator Specification_V1.1_20230720.pdf',
     applications: ['Warehouse Tracking', 'Indoor Navigation', 'Healthcare'],
     tags: ['anchor', 'ethernet', 'poe'],
-    connectivity: ['BLE', 'Ethernet', 'PoE'],
+    connectivity: ['BLE', 'Ethernet / PoE'],
     protocols: [
       { key: 'proto_mqtt', name: 'MQTT', direction: 'uplink' },
       { key: 'proto_http', name: 'HTTP', direction: 'uplink' },

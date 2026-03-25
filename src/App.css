@@ -1,16 +1,16 @@
 :root {
-  color: #0f172a;
+  color: #e2e8f0;
   background:
-    radial-gradient(circle at top left, rgba(16, 185, 129, 0.16), transparent 28%),
-    radial-gradient(circle at top right, rgba(250, 204, 21, 0.14), transparent 24%),
-    linear-gradient(180deg, #f7faf7 0%, #eef5f2 48%, #f8f7f2 100%);
+    radial-gradient(circle at top left, rgba(16, 185, 129, 0.14), transparent 24%),
+    radial-gradient(circle at top right, rgba(59, 130, 246, 0.12), transparent 26%),
+    linear-gradient(180deg, #07101f 0%, #0b1325 45%, #0a1020 100%);
 }
 
 body {
   min-width: 320px;
   min-height: 100vh;
   background: transparent;
-  color: #0f172a;
+  color: #e2e8f0;
 }
 
 a {
@@ -27,10 +27,10 @@ a {
   position: fixed;
   inset: 0;
   pointer-events: none;
-  opacity: 0.18;
+  opacity: 0.32;
   background-image:
-    linear-gradient(rgba(15, 23, 42, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(15, 23, 42, 0.04) 1px, transparent 1px);
-  background-size: 30px 30px;
+    linear-gradient(rgba(148, 163, 184, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 163, 184, 0.06) 1px, transparent 1px);
+  background-size: 34px 34px;
   mask-image: radial-gradient(circle at center, black 55%, transparent 100%);
 }

@@ -69,4 +69,9 @@ export const migrations = [
     description: 'Populate battery lifespan values from source-backed device documentation.',
     command: ['node', 'scripts/nocodb-populate-device-battery-life.mjs', '--apply'],
   },
+  {
+    id: '015-merge-ethernet-poe-connectivity',
+    description: 'Merge Ethernet RJ45 and PoE connectivity rows into a single Ethernet / PoE option.',
+    command: ['node', 'scripts/nocodb-merge-ethernet-poe-connectivity.mjs', '--apply'],
+  },
 ];

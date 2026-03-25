@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { Device, DeviceOption, DeviceSavePayload } from '../data/mockDevices';
+import { Device, DeviceOption, DeviceSavePayload, getDeviceUiCategoryLabel } from '../data/mockDevices';
 
 interface DeviceDetailPanelProps {
   device: Device | null;
@@ -8,18 +8,20 @@ interface DeviceDetailPanelProps {
   canEditDatabase: boolean;
   protocolOptions: DeviceOption[];
   connectivityOptions: DeviceOption[];
+  tagOptions: string[];
   saveState: 'idle' | 'saving' | 'saved' | 'failed';
   saveMessage: string | null;
   onCreateDraft: () => void;
   onCancelCreate: () => void;
   onSave: (device: Device, payload: DeviceSavePayload) => Promise<void>;
   onCreate: (payload: DeviceSavePayload) => Promise<void>;
+  onClose?: () => void;
 }
 
 type DetailTab = 'overview' | 'specs' | 'profiles' | 'variants' | 'documents';
 
 const inputClass =
-  'w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-950 outline-none transition focus:border-emerald-400 focus:bg-white';
+  'w-full rounded-2xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm text-slate-100 outline-none transition focus:border-emerald-400 focus:bg-slate-950';
 
 function createPanelEmptyDraft(): DeviceSavePayload {
   return {
@@ -34,6 +36,7 @@ function createPanelEmptyDraft(): DeviceSavePayload {
     description: '',
     vendorProductUrl: '',
     datasheetPath: '',
+    tags: [],
     specs: {
       bluetoothVersion: '',
       sensors: '',
@@ -89,6 +92,7 @@ function buildDraft(device: Device, protocolOptions: DeviceOption[], connectivit
     description: device.description,
     vendorProductUrl: device.vendorProductUrl ?? '',
     datasheetPath: device.datasheetPath ?? device.documents[0]?.path ?? '',
+    tags: device.tags,
     specs: {
       bluetoothVersion: device.specs.bluetoothVersion ?? '',
       sensors: device.specs.sensors?.join('\n') ?? '',
@@ -163,9 +167,9 @@ function ReadOnlyField({
   multiline?: boolean;
 }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4">
+    <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-4">
       <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">{label}</p>
-      <p className={`mt-2 text-sm font-medium text-slate-900 ${multiline ? 'whitespace-pre-line leading-6' : ''}`}>{formatDisplayValue(value)}</p>
+      <p className={`mt-2 text-sm font-medium text-slate-100 ${multiline ? 'whitespace-pre-line leading-6' : ''}`}>{formatDisplayValue(value)}</p>
     </div>
   );
 }
@@ -174,18 +178,18 @@ function ReadOnlyPillGroup({ label, values }: { label: string; values: string[] 
   const normalizedValues = values.filter(Boolean);
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4">
+    <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-4">
       <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">{label}</p>
       {normalizedValues.length ? (
         <div className="mt-3 flex flex-wrap gap-2">
           {normalizedValues.map((value) => (
-            <span key={`${label}-${value}`} className="rounded-full bg-white px-3 py-1.5 text-xs font-medium text-slate-700">
+            <span key={`${label}-${value}`} className="rounded-full border border-slate-700 bg-slate-950 px-3 py-1.5 text-xs font-medium text-slate-200">
               {value}
             </span>
           ))}
         </div>
       ) : (
-        <p className="mt-2 text-sm font-medium text-slate-900">Not mapped</p>
+        <p className="mt-2 text-sm font-medium text-slate-100">Not mapped</p>
       )}
     </div>
   );
@@ -219,29 +223,29 @@ function DeviceVariantComparison({ device }: { device: Device }) {
   ];
 
   return (
-    <section className="mt-6 rounded-[28px] border border-slate-200 bg-slate-50/80 p-4">
+    <section className="mt-6 rounded-[28px] border border-slate-800 bg-slate-900/80 p-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h4 className="text-sm font-semibold text-slate-950">Variant Comparison</h4>
-          <p className="mt-1 text-sm text-slate-600">
+          <h4 className="text-sm font-semibold text-slate-100">Variant Comparison</h4>
+          <p className="mt-1 text-sm text-slate-400">
             {device.variantGroup ?? `${device.modelNumber ?? device.title} variants`} across work mode, firmware, sensors, and notes.
           </p>
         </div>
-        <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-600">
+        <span className="rounded-full border border-slate-700 bg-slate-950 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-300">
           {device.variants.length} variants
         </span>
       </div>
 
       <div className="mt-4 overflow-x-auto">
-        <table className="min-w-full border-separate border-spacing-0 overflow-hidden rounded-2xl border border-slate-200 bg-white text-sm text-slate-700">
-          <thead className="bg-slate-100 text-slate-900">
+        <table className="min-w-full border-separate border-spacing-0 overflow-hidden rounded-2xl border border-slate-800 bg-slate-950 text-sm text-slate-300">
+          <thead className="bg-slate-900 text-slate-100">
             <tr>
-              <th className="border-b border-slate-200 px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+              <th className="border-b border-slate-800 px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
                 Attribute
               </th>
               {device.variants.map((variant) => (
-                <th key={variant.id} className="border-b border-l border-slate-200 px-4 py-3 text-left align-top">
-                  <p className="font-semibold text-slate-950">{variant.label}</p>
+                <th key={variant.id} className="border-b border-l border-slate-800 px-4 py-3 text-left align-top">
+                  <p className="font-semibold text-slate-100">{variant.label}</p>
                   {variant.chipset ? <p className="mt-1 text-xs font-medium uppercase tracking-[0.12em] text-slate-500">{variant.chipset}</p> : null}
                 </th>
               ))}
@@ -249,12 +253,12 @@ function DeviceVariantComparison({ device }: { device: Device }) {
           </thead>
           <tbody>
             {rows.map((row, rowIndex) => (
-              <tr key={row.label} className={rowIndex % 2 === 1 ? 'bg-slate-50/70' : 'bg-white'}>
-                <th className="border-b border-slate-200 px-4 py-3 text-left align-top text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+              <tr key={row.label} className={rowIndex % 2 === 1 ? 'bg-slate-900/80' : 'bg-slate-950'}>
+                <th className="border-b border-slate-800 px-4 py-3 text-left align-top text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
                   {row.label}
                 </th>
                 {row.values.map((value, columnIndex) => (
-                  <td key={`${row.label}-${device.variants?.[columnIndex]?.id ?? columnIndex}`} className="whitespace-pre-line border-b border-l border-slate-200 px-4 py-3 align-top">
+                  <td key={`${row.label}-${device.variants?.[columnIndex]?.id ?? columnIndex}`} className="whitespace-pre-line border-b border-l border-slate-800 px-4 py-3 align-top">
                     {value}
                   </td>
                 ))}
@@ -273,12 +277,14 @@ function DeviceDetailPanel({
   canEditDatabase,
   protocolOptions,
   connectivityOptions,
+  tagOptions,
   saveState,
   saveMessage,
   onCreateDraft,
   onCancelCreate,
   onSave,
   onCreate,
+  onClose,
 }: DeviceDetailPanelProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [activeTab, setActiveTab] = useState<DetailTab>('overview');
@@ -287,12 +293,12 @@ function DeviceDetailPanel({
 
   if (!device && !newDeviceDraft) {
     return (
-      <aside className="rounded-[28px] border border-slate-200 bg-white/85 p-6 shadow-[0_18px_60px_-35px_rgba(15,23,42,0.45)] backdrop-blur">
+      <aside className="rounded-[28px] border border-slate-800 bg-slate-950/85 p-6 shadow-[0_24px_70px_-40px_rgba(2,6,23,0.95)] backdrop-blur">
         <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Device Details</p>
-        <h3 className="mt-2 text-xl font-semibold text-slate-950">Select a device to inspect technical fit</h3>
-        <p className="mt-3 text-sm leading-6 text-slate-600">Use the filters to narrow the shortlist, then open a device card to review and edit mapped data.</p>
+        <h3 className="mt-2 text-xl font-semibold text-slate-100">Select a device to inspect technical fit</h3>
+        <p className="mt-3 text-sm leading-6 text-slate-400">Use the filters to narrow the shortlist, then open a device card to review and edit mapped data.</p>
         {canEditDatabase ? (
-          <button type="button" onClick={onCreateDraft} className="mt-5 rounded-full bg-slate-950 px-4 py-2 text-sm font-medium text-white">
+          <button type="button" onClick={onCreateDraft} className="mt-5 rounded-full bg-emerald-500 px-4 py-2 text-sm font-medium text-slate-950">
             Add device
           </button>
         ) : null}
@@ -342,28 +348,48 @@ function DeviceDetailPanel({
     : [];
 
   return (
-    <aside className="flex max-h-[calc(100vh-3rem)] min-h-[520px] flex-col rounded-[28px] border border-slate-200 bg-white/90 p-6 shadow-[0_18px_60px_-35px_rgba(15,23,42,0.45)] backdrop-blur">
+    <aside className="flex max-h-[calc(100vh-3rem)] min-h-[520px] flex-col rounded-[28px] border border-slate-800 bg-slate-950/90 p-6 shadow-[0_24px_70px_-40px_rgba(2,6,23,0.95)] backdrop-blur">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-700">Device Details</p>
-          <h3 className="mt-2 text-2xl font-semibold text-slate-950">{isCreating ? 'Create New Device' : currentDevice?.title}</h3>
-          <p className="mt-2 text-sm text-slate-600">
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-300">Device Details</p>
+          <h3 className="mt-2 text-2xl font-semibold text-slate-100">{isCreating ? 'Create New Device' : currentDevice?.title}</h3>
+          <p className="mt-2 text-sm text-slate-400">
             {isCreating ? 'Add a new gateway, anchor, or beacon directly into NocoDB.' : `${currentDevice?.manufacturer}${currentDevice?.modelNumber ? ` | ${currentDevice.modelNumber}` : ''}${currentDevice?.role ? ` | ${currentDevice.role}` : ''}`}
           </p>
         </div>
         {canEditDatabase ? (
           <div className="flex gap-2">
+            {onClose ? (
+              <button
+                type="button"
+                onClick={onClose}
+                className="rounded-full border border-slate-700 px-3 py-2 text-sm font-medium text-slate-300 transition hover:border-slate-600 hover:text-white"
+              >
+                Close
+              </button>
+            ) : null}
             {isEditing ? (
               <>
-                <button type="button" onClick={() => { setIsEditing(false); setDraft(null); setLocalError(null); if (isCreating) onCancelCreate(); }} className="rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700">Cancel</button>
-                <button type="button" onClick={() => void saveDraft()} disabled={saveState === 'saving'} className="rounded-full bg-emerald-600 px-4 py-2 text-sm font-medium text-white disabled:bg-emerald-300">{saveState === 'saving' ? 'Saving...' : isCreating ? 'Create' : 'Save'}</button>
+                <button type="button" onClick={() => { setIsEditing(false); setDraft(null); setLocalError(null); if (isCreating) onCancelCreate(); }} className="rounded-full border border-slate-700 px-4 py-2 text-sm font-medium text-slate-300">Cancel</button>
+                <button type="button" onClick={() => void saveDraft()} disabled={saveState === 'saving'} className="rounded-full bg-emerald-500 px-4 py-2 text-sm font-medium text-slate-950 disabled:bg-emerald-300">{saveState === 'saving' ? 'Saving...' : isCreating ? 'Create' : 'Save'}</button>
               </>
             ) : (
-              <button type="button" onClick={() => { setDraft(isCreating ? activeDraft : buildDraft(currentDevice as Device, protocolOptions, connectivityOptions)); setIsEditing(true); }} className="rounded-full bg-slate-950 px-4 py-2 text-sm font-medium text-white">{isCreating ? 'Start editing' : 'Edit device'}</button>
+              <button type="button" onClick={() => { setDraft(isCreating ? activeDraft : buildDraft(currentDevice as Device, protocolOptions, connectivityOptions)); setIsEditing(true); }} className="rounded-full bg-slate-900 px-4 py-2 text-sm font-medium text-slate-100 border border-slate-700">{isCreating ? 'Start editing' : 'Edit device'}</button>
             )}
           </div>
         ) : (
-          <span className="rounded-full border border-amber-200 bg-amber-50 px-4 py-2 text-xs font-medium text-amber-700">Read-only</span>
+          <div className="flex gap-2">
+            {onClose ? (
+              <button
+                type="button"
+                onClick={onClose}
+                className="rounded-full border border-slate-700 px-3 py-2 text-sm font-medium text-slate-300 transition hover:border-slate-600 hover:text-white"
+              >
+                Close
+              </button>
+            ) : null}
+            <span className="rounded-full border border-amber-500/30 bg-amber-500/10 px-4 py-2 text-xs font-medium text-amber-200">Read-only</span>
+          </div>
         )}
       </div>
 
@@ -412,12 +438,12 @@ function DeviceDetailPanel({
 
           <section>
             <div className="flex items-center justify-between">
-              <h4 className="text-sm font-semibold text-slate-900">Protocols</h4>
-              <button type="button" onClick={() => updateDraft({ protocols: [...activeDraft.protocols, { protocolKey: protocolOptions[0]?.key ?? '', direction: 'broadcast', details: '' }] })} className="rounded-full border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-700">Add</button>
+              <h4 className="text-sm font-semibold text-slate-100">Protocols</h4>
+              <button type="button" onClick={() => updateDraft({ protocols: [...activeDraft.protocols, { protocolKey: protocolOptions[0]?.key ?? '', direction: 'broadcast', details: '' }] })} className="rounded-full border border-slate-700 px-3 py-1.5 text-xs font-medium text-slate-300">Add</button>
             </div>
             <div className="mt-3 space-y-3">
               {activeDraft.protocols.map((protocol, index) => (
-                <div key={`${protocol.protocolKey}-${index}`} className="flex flex-wrap items-start gap-3 rounded-2xl border border-slate-200 p-4">
+                <div key={`${protocol.protocolKey}-${index}`} className="flex flex-wrap items-start gap-3 rounded-2xl border border-slate-700 bg-slate-900/50 p-4">
                   <select
                     value={protocol.protocolKey}
                     onChange={(event) => updateDraft({ protocols: activeDraft.protocols.map((entry, entryIndex) => entryIndex === index ? { ...entry, protocolKey: event.target.value } : entry) })}
@@ -440,21 +466,47 @@ function DeviceDetailPanel({
                     placeholder="Optional notes"
                     aria-label="Details"
                   />
-                  <button type="button" onClick={() => updateDraft({ protocols: activeDraft.protocols.filter((_, entryIndex) => entryIndex !== index) })} className="rounded-full border border-rose-200 px-4 py-3 text-xs font-medium text-rose-700 sm:ml-auto">Remove</button>
+                  <button type="button" onClick={() => updateDraft({ protocols: activeDraft.protocols.filter((_, entryIndex) => entryIndex !== index) })} className="rounded-full border border-rose-500/30 px-4 py-3 text-xs font-medium text-rose-300 sm:ml-auto">Remove</button>
                 </div>
               ))}
             </div>
           </section>
 
           <section>
-            <h4 className="text-sm font-semibold text-slate-900">Connectivity</h4>
+            <h4 className="text-sm font-semibold text-slate-100">Connectivity</h4>
             <div className="mt-3 grid gap-2 sm:grid-cols-2">
               {connectivityOptions.map((option) => {
                 const active = activeDraft.connectivityKeys.includes(option.key);
                 return (
-                  <button key={option.key} type="button" onClick={() => updateDraft({ connectivityKeys: active ? activeDraft.connectivityKeys.filter((entry) => entry !== option.key) : [...activeDraft.connectivityKeys, option.key] })} className={`flex items-center justify-between rounded-2xl border px-4 py-3 text-sm ${active ? 'border-emerald-600 bg-emerald-50 text-emerald-900' : 'border-slate-200 bg-slate-50 text-slate-700'}`}>
+                  <button key={option.key} type="button" onClick={() => updateDraft({ connectivityKeys: active ? activeDraft.connectivityKeys.filter((entry) => entry !== option.key) : [...activeDraft.connectivityKeys, option.key] })} className={`flex items-center justify-between rounded-2xl border px-4 py-3 text-sm ${active ? 'border-emerald-500 bg-emerald-500/12 text-emerald-200' : 'border-slate-700 bg-slate-900 text-slate-300'}`}>
                     <span>{option.label}</span>
-                    <span className={`h-2.5 w-2.5 rounded-full ${active ? 'bg-emerald-600' : 'bg-slate-300'}`} />
+                    <span className={`h-2.5 w-2.5 rounded-full ${active ? 'bg-emerald-400' : 'bg-slate-500'}`} />
+                  </button>
+                );
+              })}
+            </div>
+          </section>
+
+          <section>
+            <h4 className="text-sm font-semibold text-slate-100">Business Tags</h4>
+            <div className="mt-3 grid gap-2 sm:grid-cols-2">
+              {tagOptions.map((tag) => {
+                const active = activeDraft.tags.includes(tag);
+                return (
+                  <button
+                    key={tag}
+                    type="button"
+                    onClick={() =>
+                      updateDraft({
+                        tags: active ? activeDraft.tags.filter((entry) => entry !== tag) : [...activeDraft.tags, tag],
+                      })
+                    }
+                    className={`flex items-center justify-between rounded-2xl border px-4 py-3 text-sm ${
+                      active ? 'border-emerald-500 bg-emerald-500/12 text-emerald-200' : 'border-slate-700 bg-slate-900 text-slate-300'
+                    }`}
+                  >
+                    <span>{tag}</span>
+                    <span className={`h-2.5 w-2.5 rounded-full ${active ? 'bg-emerald-400' : 'bg-slate-500'}`} />
                   </button>
                 );
               })}
@@ -491,7 +543,7 @@ function DeviceDetailPanel({
                     type="button"
                     onClick={() => setActiveTab(tab.key)}
                     className={`rounded-full px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] transition ${
-                      activeTab === tab.key ? 'bg-slate-950 text-white' : 'border border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:text-slate-900'
+                      activeTab === tab.key ? 'bg-emerald-500 text-slate-950' : 'border border-slate-700 bg-slate-900 text-slate-400 hover:border-slate-600 hover:text-slate-100'
                     }`}
                   >
                     {tab.label}
@@ -503,19 +555,19 @@ function DeviceDetailPanel({
                 <div className="space-y-4">
                   {currentDevice.vendorProductUrl ? (
                     <div>
-                      <a href={currentDevice.vendorProductUrl} target="_blank" rel="noreferrer" className="inline-flex items-center rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700">
+                      <a href={currentDevice.vendorProductUrl} target="_blank" rel="noreferrer" className="inline-flex items-center rounded-full border border-slate-700 px-4 py-2 text-sm font-medium text-slate-200">
                         Official product page
                       </a>
                     </div>
                   ) : null}
 
-                  <div className="rounded-[24px] border border-slate-200 bg-slate-50/70 p-5">
+                  <div className="rounded-[24px] border border-slate-800 bg-slate-900/70 p-5">
                     <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Description</p>
-                    <p className="mt-3 text-sm leading-6 text-slate-700">{currentDevice.description}</p>
+                    <p className="mt-3 text-sm leading-6 text-slate-300">{currentDevice.description}</p>
                   </div>
 
                   <div className="grid gap-3 sm:grid-cols-2">
-                    <ReadOnlyField label="Category" value={currentDevice.category} />
+                    <ReadOnlyField label="Category" value={getDeviceUiCategoryLabel(currentDevice)} />
                     <ReadOnlyField label="Status" value={currentDevice.status} />
                     <ReadOnlyField label="Manufacturer" value={currentDevice.manufacturer} />
                     <ReadOnlyField label="Model Number" value={currentDevice.modelNumber} />
@@ -573,8 +625,8 @@ function DeviceDetailPanel({
               {activeTab === 'profiles' && (
                 <div className="space-y-4">
                   {currentDevice.anchorProfile ? (
-                    <div className="space-y-3 rounded-[24px] border border-amber-200 bg-amber-50/70 p-4">
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-700">Anchor Profile</p>
+                    <div className="space-y-3 rounded-[24px] border border-amber-500/20 bg-amber-500/10 p-4">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-300">Anchor Profile</p>
                       <div className="grid gap-3 sm:grid-cols-2">
                         <ReadOnlyField label="Positioning Technology" value={currentDevice.anchorProfile.positioningTechnology} />
                         <ReadOnlyField label="Positioning Accuracy" value={currentDevice.anchorProfile.positioningAccuracy} />
@@ -600,7 +652,7 @@ function DeviceDetailPanel({
                   ) : null}
 
                   {currentDevice.gatewayProfile ? (
-                    <div className="space-y-3 rounded-[24px] bg-slate-950 p-4">
+                    <div className="space-y-3 rounded-[24px] border border-slate-800 bg-slate-900 p-4">
                       <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-300">Gateway Profile</p>
                       <div className="grid gap-3 sm:grid-cols-2">
                         <ReadOnlyField label="Payload Format" value={currentDevice.gatewayProfile.payloadFormat} />
@@ -635,11 +687,11 @@ function DeviceDetailPanel({
 
               {activeTab === 'documents' && (
                 <section>
-                  <h4 className="text-sm font-semibold text-slate-900">Documents</h4>
+                  <h4 className="text-sm font-semibold text-slate-100">Documents</h4>
                   <div className="mt-3 space-y-3">
                     {currentDevice.documents.length ? currentDevice.documents.map((document) => (
-                      <a key={`${document.label}-${document.path}`} href={toFileHref(document.path)} target="_blank" rel="noreferrer" className="block rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-700">
-                        <span className="block font-medium text-slate-950">{document.label}</span>
+                      <a key={`${document.label}-${document.path}`} href={toFileHref(document.path)} target="_blank" rel="noreferrer" className="block rounded-2xl border border-slate-800 bg-slate-900/80 px-4 py-3 text-sm text-slate-300">
+                        <span className="block font-medium text-slate-100">{document.label}</span>
                         <span className="mt-1 block break-all text-xs text-slate-500">{document.path}</span>
                       </a>
                     )) : <p className="text-sm text-slate-500">No documents mapped yet.</p>}
@@ -654,11 +706,11 @@ function DeviceDetailPanel({
 
       {isEditing ? (
       <section className="mt-6">
-        <h4 className="text-sm font-semibold text-slate-900">Documents</h4>
+        <h4 className="text-sm font-semibold text-slate-100">Documents</h4>
         <div className="mt-3 space-y-3">
           {currentDevice?.documents.length ? currentDevice.documents.map((document) => (
-            <a key={`${document.label}-${document.path}`} href={toFileHref(document.path)} target="_blank" rel="noreferrer" className="block rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-700">
-              <span className="block font-medium text-slate-950">{document.label}</span>
+            <a key={`${document.label}-${document.path}`} href={toFileHref(document.path)} target="_blank" rel="noreferrer" className="block rounded-2xl border border-slate-800 bg-slate-900/80 px-4 py-3 text-sm text-slate-300">
+              <span className="block font-medium text-slate-100">{document.label}</span>
               <span className="mt-1 block break-all text-xs text-slate-500">{document.path}</span>
             </a>
           )) : <p className="text-sm text-slate-500">No documents mapped yet.</p>}

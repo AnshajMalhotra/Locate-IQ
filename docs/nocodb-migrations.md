@@ -44,6 +44,7 @@ npm run db:migrations:reapply
 12. `012-convert-device-sensors-to-multiselect`
 13. `013-add-device-battery-life-field`
 14. `014-populate-device-battery-life`
+15. `015-merge-ethernet-poe-connectivity`
 
 ## Notes
 
