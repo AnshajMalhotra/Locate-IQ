@@ -1,0 +1,76 @@
+{
+  "input": {
+    "url": "https://www.mokosmart.com/mokosmart-h4-beacon-temperature-humidity-sensor-supporting-ble5-0/",
+    "pdf": "public/docs/beacons/h4/H4-Series-Product-Brief_20250619.pdf",
+    "category": "beacon"
+  },
+  "proposal": {
+    "device": {
+      "title": "H4 Temperature & Humidity Sensor",
+      "device_key": "beacon_h4_temp_humidity_sensor",
+      "device_name": "H4 Temperature & Humidity Sensor",
+      "manufacturer": "MOKO SMART",
+      "model_number": "H4",
+      "category": "beacon",
+      "subcategory": "BLE beacon",
+      "role": "sensor beacon",
+      "description": "H4 temperature and humidity sensor is your key to unlocking precise data. Experience the BLE5.0 beacon for perfect environmental monitoring.",
+      "datasheet_path": "public/docs/beacons/h4/H4-Series-Product-Brief_20250619.pdf",
+      "vendor_product_url": "https://www.mokosmart.com/mokosmart-h4-beacon-temperature-humidity-sensor-supporting-ble5-0/",
+      "status": "active"
+    },
+    "specs": {
+      "title": "beacon_h4_temp_humidity_sensor",
+      "device_key": "beacon_h4_temp_humidity_sensor",
+      "bluetooth_version": "BLE 5.1",
+      "sensors": "temperature sensor,humidity sensor,accelerometer sensor,barometric pressure sensor",
+      "battery_life_estimate": "5 years",
+      "ip_rating": "",
+      "backhaul_type": "BLE sensor telemetry via gateway / tracker uplink",
+      "power_supply": "Battery",
+      "installation": "",
+      "battery_capacity": "Battery",
+      "dimensions": "70mm x 32.2mm x 18.2mm",
+      "weight": "",
+      "material": "IP rating",
+      "manual_path": "public/docs/beacons/h4/H4-Series-Product-Brief_20250619.pdf"
+    },
+    "connectivity": [
+      {
+        "key": "conn_ble",
+        "label": "BLE"
+      }
+    ],
+    "protocols": [
+      {
+        "protocol_key": "proto_ble",
+        "name": "BLE",
+        "direction": "broadcast",
+        "details": ""
+      }
+    ],
+    "applications": [
+      "Warehouse Tracking",
+      "Environmental Monitoring"
+    ],
+    "tags": [
+      "beacon",
+      "sensor"
+    ],
+    "sources": {
+      "batteryLifeEstimate": "ns ID appearance Dimensions(L*W*H) Connectivity Color Material IP rating Battery capacity Battery lifespan Flash LED Accelerometer sensor Barometric pressure sensor Operating temperature Temperature accuracy Humidity accuracy Certification BLE 5.1 White ABS+PC & PMMA IPX4 1200mAh | 2*AA Replaceable battery 5 years 2M Bytes (60000 groups data logging support) Red & Green & Blue Optional Optional -20℃/ +60℃ (Body) -40℃/ +125℃ (Probe) ±0.5℃ ±0.3℃ ±0.3℃ ±3% RH FCC | CE | RoHS | REACH 70mm x 32.2mm x 18.2mm 88mm x 32.2mm x 18.2mm 70mm x 32.2mm x 18.2mm (H4) Φ3.0 with 1 meter length (Probe) ±2% RH ±2% RH H4 H4 Pro H4 Probe Temperature & Humidity Sensor H4 Series Environmental monitoring ±0.3 / ±2% RH High accuracy 50000 groups historical data storage 5 years Battery lifetime T&H&Pressure All-in-one Sensor Cloud MKGW1 4G/GPS Tracker 4G/GPS Tracker Cloud Cold-Chain Warehouse -- 1 of 1 --",
+      "batteryCapacity": "eral specifications ID appearance Dimensions(L*W*H) Connectivity Color Material IP rating Battery capacity Battery lifespan Flash LED Accelerometer sensor Barometric pressure sensor Operating temperature Temperature accuracy Humidity accuracy Certification BLE 5.1 White ABS+PC & PMMA IPX4 1200mAh | 2*AA Replaceable battery 5 years 2M Bytes (60000 groups data logging support) Red & Green & Blue Optional Optional -20℃/ +60℃ (Body) -40℃/ +125℃ (Probe) ±0.5℃ ±0.3℃ ±0.3℃ ±3% RH FCC | CE | RoHS | REACH 70mm x 32.2mm x 18.2mm 88mm x 32.2mm x 18.2mm 70mm x 32.2mm x 18.2mm (H4) Φ3.0 with 1 meter length (Probe) ±2% RH ±2% RH H4 H4 Pro H4 Probe Temperature & Humidity Sensor H4 Series Environmental monitoring ±0.3 / ±2% RH High accuracy 50000 groups historical data storage 5 years Battery lifetime T&H&Pressure All-in-one Sensor Cloud MKGW1 4G/GPS Tracker 4G/GPS Tracker Cloud Cold-Chain Warehouse -- 1 of 1 --",
+      "dimensions": null,
+      "powerSupply": "eral specifications ID appearance Dimensions(L*W*H) Connectivity Color Material IP rating Battery capacity Battery lifespan Flash LED Accelerometer sensor Barometric pressure sensor Operating temperature Temperature accuracy Humidity accuracy Certification BLE 5.1 White ABS+PC & PMMA IPX4 1200mAh | 2*AA Replaceable battery 5 years 2M Bytes (60000 groups data logging support) Red & Green & Blue Optional Optional -20℃/ +60℃ (Body) -40℃/ +125℃ (Probe) ±0.5℃ ±0.3℃ ±0.3℃ ±3% RH FCC | CE | RoHS | REACH 70mm x 32.2mm x 18.2mm 88mm x 32.2mm x 18.2mm 70mm x 32.2mm x 18.2mm (H4) Φ3.0 with 1 meter length (Probe) ±2% RH ±2% RH H4 H4 Pro H4 Probe Temperature & Humidity Sensor H4 Series Environmental monitoring ±0.3 / ±2% RH High accuracy 50000 groups historical data storage 5 years Battery lifetime T&H&Pressure All-in-one Sensor Cloud MKGW1 4G/GPS Tracker 4G/GPS Tracker Cloud Cold-Chain Warehouse -- 1 of 1 --",
+      "sensors": "Discover our temperature & humidity sensor model based on Bluetooth Low Energy from MOKO with a long-lifetime battery and multiple options. Perfect for T&H traceability or monitoring use cases, fresh food delivery tracking, agriculture environmental monitoring, and cold-chain transportation. It collects the temperature and humidity of the environment and transmits the data via BLE to vehicle trackers or BLE gateways, then transmitted to server finally. Applications www.mokosmart.com General specifications ID appearance Dimensions(L*W*H) Connectivity Color Material IP rating Battery capacity Battery lifespan Flash LED Accelerometer sensor Barometric pressure sensor Operating temperature Temperature accuracy Humidity accuracy Certification BLE 5.1 White ABS+PC & PMMA IPX4 1200mAh | 2*AA Replaceable battery 5 years 2M Bytes (60000 groups data logging support) Red & Green & Blue Optional Optional -20℃/ +60℃ (Body) -40℃/ +125℃ (Probe) ±0.5℃ ±0.3℃ ±0.3℃ ±3% RH FCC | CE | RoHS | REACH 70mm x 32.2mm x 18.2mm 88mm x 32.2mm x 18.2mm 70mm x 32.2mm x 18.2mm (H4) Φ3.0 with 1 meter length (Probe) ±2% RH ±2% RH H4 H4 Pro H4 Probe Temperature & Humidity Sensor H4 Series Environmental monitoring ±0.3 / ±2% RH High accuracy 50000 groups historical data storage 5 years Battery lifetime T&H&Pressure All-in-one Sensor Cloud MKGW1 4G/GPS Tracker 4G/GPS Tracker Cloud Cold-Chain Warehouse -- 1 of 1 --",
+      "ipRating": null
+    }
+  },
+  "review": {
+    "missingFields": [],
+    "notes": [
+      "Review this JSON before applying it to NocoDB.",
+      "If any field is wrong or incomplete, refine the parser rules rather than editing the DB directly."
+    ]
+  }
+}

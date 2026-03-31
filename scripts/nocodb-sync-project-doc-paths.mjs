@@ -18,8 +18,11 @@ const DEVICE_DATASHEET_PATHS = {
   anchor_l03: '/docs/anchors/l03/L03-Product-Brief_V2.0.pdf',
   anchor_l04: '/docs/anchors/l04/L04-brief_250207.pdf',
   anchor_l05_usb_beacon: '/docs/anchors/l05/L05-USB-Beacon-Brief.pdf',
-  beacon_m1p_led_tag: '/docs/beacons/m1p/M1P-LED-Tag-Brief.pdf',
-  beacon_m5_high_temp_tag: '/docs/beacons/m5/M5-High-Temp-Resistant-Tag-Brief_V1.2.pdf',
+  beacon_s03d_door_monitoring_sensor: '/docs/beacons/S03D/S03D-Door-Sensor-Product-Brief_V2.1.pdf',
+  beacon_h4_temp_humidity_sensor: '/docs/beacons/h4/H4-Series-Product-Brief_20250619.pdf',
+  beacon_h4_pro_temp_humidity_sensor: '/docs/beacons/h4/H4-Series-Product-Brief_20250619.pdf',
+  beacon_m1p_led_tag: '/docs/tags/m1p/M1P-LED-Tag-Brief.pdf',
+  beacon_m5_high_temp_tag: '/docs/tags/m5/M5-High-Temp-Resistant-Tag-Brief_V1.2.pdf',
 };
 
 const DEVICE_MANUAL_PATHS = {
@@ -34,8 +37,11 @@ const DEVICE_MANUAL_PATHS = {
   anchor_l03: '/docs/anchors/l03/L03-Product-Brief_V2.0.pdf',
   anchor_l04: '/docs/anchors/l04/L04-brief_250207.pdf',
   anchor_l05_usb_beacon: '/docs/anchors/l05/L05-USB-Beacon-Brief.pdf',
-  beacon_m1p_led_tag: '/docs/beacons/m1p/M1P-LED-Tag-Brief.pdf',
-  beacon_m5_high_temp_tag: '/docs/beacons/m5/M5-High-Temp-Resistant-Tag-Brief_V1.2.pdf',
+  beacon_s03d_door_monitoring_sensor: '/docs/beacons/S03D/S03D-Door-Sensor-Product-Brief_V2.1.pdf',
+  beacon_h4_temp_humidity_sensor: '/docs/beacons/h4/H4-Series-Product-Brief_20250619.pdf',
+  beacon_h4_pro_temp_humidity_sensor: '/docs/beacons/h4/H4-Series-Product-Brief_20250619.pdf',
+  beacon_m1p_led_tag: '/docs/tags/m1p/M1P-LED-Tag-Brief.pdf',
+  beacon_m5_high_temp_tag: '/docs/tags/m5/M5-High-Temp-Resistant-Tag-Brief_V1.2.pdf',
 };
 
 function parseEnv(text) {

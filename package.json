@@ -27,6 +27,7 @@
     "db:anchors:links:apply": "node scripts/nocodb-backfill-anchor-links.mjs --apply",
     "db:seed:moko-additional": "node scripts/nocodb-seed-moko-additional-devices.mjs",
     "db:seed:moko-additional:apply": "node scripts/nocodb-seed-moko-additional-devices.mjs --apply",
+    "ingest:product": "node scripts/product-ingest-review.mjs",
     "dev": "vite",
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",

@@ -1,0 +1,91 @@
+{
+  "input": {
+    "url": "https://www.mokosmart.com/bluetooth-door-sensor/",
+    "pdf": "/docs/beacons/S03D/S03D-Door-Sensor-Product-Brief_V2.1.pdf",
+    "category": "beacon"
+  },
+  "proposal": {
+    "device": {
+      "title": "S03D Door Monitoring Sensor Beacon",
+      "device_key": "beacon_s03d_door_monitoring_sensor",
+      "device_name": "S03D Door Monitoring Sensor Beacon",
+      "manufacturer": "MOKO SMART",
+      "model_number": "S03D",
+      "category": "beacon",
+      "subcategory": "BLE beacon",
+      "role": "sensor beacon",
+      "description": "Bluetooth door sensor identifies and detect the opening and closing of doors, windows, and cabinets, enabling real-time alerts.",
+      "datasheet_path": "/docs/beacons/S03D/S03D-Door-Sensor-Product-Brief_V2.1.pdf",
+      "vendor_product_url": "https://www.mokosmart.com/bluetooth-door-sensor/",
+      "status": "active"
+    },
+    "specs": {
+      "title": "beacon_s03d_door_monitoring_sensor",
+      "device_key": "beacon_s03d_door_monitoring_sensor",
+      "bluetooth_version": "BLE 5.0",
+      "sensors": "hall-effect sensor",
+      "battery_life_estimate": "8 years",
+      "ip_rating": "IPX4",
+      "backhaul_type": "BLE sensor telemetry via gateway / tracker uplink",
+      "power_supply": "Battery | ER14505(3.6V) 2600mAh | Replaceable",
+      "installation": "3M sticker | Holder with screw",
+      "battery_capacity": "ER14505(3.6V) 2600mAh | Replaceable",
+      "dimensions": "77.5*27.0*24.7 (Body) | 40.0*16.0*15.0 (Magnet)",
+      "weight": "30g",
+      "material": "PC",
+      "manual_path": "/docs/beacons/S03D/S03D-Door-Sensor-Product-Brief_V2.1.pdf"
+    },
+    "connectivity": [
+      {
+        "key": "conn_ble",
+        "label": "BLE"
+      }
+    ],
+    "protocols": [
+      {
+        "protocol_key": "proto_ble",
+        "name": "BLE",
+        "direction": "broadcast",
+        "details": ""
+      }
+    ],
+    "applications": [
+      "Environmental Monitoring"
+    ],
+    "tags": [
+      "beacon",
+      "sensor"
+    ],
+    "sources": {
+      "batteryLifeEstimate": "vity: Dimensions: Color: Material: Weight: Sensor: Detection threshold: Battery capacity: Battery lifespan Operating temperature: BLE 5.0 77.5*27.0*24.7 (Body) 40.0*16.0*15.0 (Magnet) White PC 30g Hall effect sensor 25m",
+      "batteryCapacity": "benefits Connectivity: Dimensions: Color: Material: Weight: Sensor: Detection threshold: Battery capacity: Battery lifespan Operating temperature: BLE 5.0 77.5*27.0*24.7 (Body) 40.0*16.0*15.0 (Magnet) White PC 30g",
+      "dimensions": "77.5*27.0*24.7 (Body) | 40.0*16.0*15.0 (Magnet)",
+      "powerSupply": "benefits Connectivity: Dimensions: Color: Material: Weight: Sensor: Detection threshold: Battery capacity: Battery lifespan Operating temperature: BLE 5.0 77.5*27.0*24.7 (Body) 40.0*16.0*15.0 (Magnet) White PC 30g",
+      "sensors": "Operating temperature: BLE 5.0 77.5*27.0*24.7 (Body) 40.0*16.0*15.0 (Magnet) White PC 30g Hall effect sensor 25mm(1 inch) ER14505(3.6V) 2600mAh | Replaceable 8 years -20°C to 60°C Waterproof Transmi",
+      "ipRating": null
+    }
+  },
+  "review": {
+    "parsedPdfSpecs": {
+      "Connectivity": "BLE 5.0",
+      "Dimensions": "77.5*27.0*24.7 (Body) | 40.0*16.0*15.0 (Magnet)",
+      "Color": "White",
+      "Material": "PC",
+      "Weight": "30g",
+      "Sensor": "Hall effect sensor",
+      "Detection threshold": "25mm(1 inch)",
+      "Battery capacity": "ER14505(3.6V) 2600mAh | Replaceable",
+      "Battery lifespan": "8 years",
+      "Operating temperature": "-20°C to 60°C",
+      "Waterproof": "IPX4",
+      "Transmission range": "150m (in open area without obstacles)",
+      "Installation": "3M sticker | Holder with screw",
+      "Certification": "FCC | CE | RoHS | REACH"
+    },
+    "missingFields": [],
+    "notes": [
+      "Review this JSON before applying it to NocoDB.",
+      "If any field is wrong or incomplete, refine the parser rules rather than editing the DB directly."
+    ]
+  }
+}

@@ -19,6 +19,9 @@ const URLS = {
   anchor_l03: 'https://www.mokosmart.com/l03-navigation-anchor/',
   anchor_l04: 'https://www.mokosmart.com/l04-navigation-anchor/',
   anchor_l05_usb_beacon: 'https://www.mokosmart.com/l05-usb-ble-beacon/',
+  beacon_s03d_door_monitoring_sensor: 'https://www.mokosmart.com/bluetooth-door-sensor/',
+  beacon_h4_temp_humidity_sensor: 'https://www.mokosmart.com/mokosmart-h4-beacon-temperature-humidity-sensor-supporting-ble5-0/',
+  beacon_h4_pro_temp_humidity_sensor: 'https://store.mokosmart.com/product/h4-pro-temperature-humidity-sensor/',
   beacon_m1p_led_tag: 'https://www.mokosmart.com/m1p-led-tag/',
   beacon_m5_high_temp_tag: 'https://www.mokosmart.com/m5-high-temp-resistant-tag/',
 };

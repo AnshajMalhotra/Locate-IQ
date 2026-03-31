@@ -14,7 +14,7 @@ Examples:
 
 - `/docs/gateways/mkgw4/MKGW4-Configuration-APP-User-Manual-V1.0.pdf`
 - `/docs/anchors/l03/L03-Product-Brief_V2.0.pdf`
-- `/docs/beacons/m1p/M1P-LED-Tag-Brief_241115.pdf`
+- `/docs/tags/m1p/M1P-LED-Tag-Brief.pdf`
 
 Recommended next step:
 
