@@ -1,4 +1,5 @@
 import { Device, getDeviceUiCategoryLabel } from '../data/mockDevices';
+import DeviceImage from './DeviceImage';
 
 interface DeviceCardProps {
   device: Device;
@@ -25,6 +26,12 @@ function DeviceCard({ device, isSelected, onSelect }: DeviceCardProps) {
           : 'border-slate-800 bg-slate-800/75 shadow-[0_22px_70px_-42px_rgba(2,6,23,0.95)] hover:-translate-y-0.5 hover:border-slate-700 hover:bg-slate-800/95'
       }`}
     >
+      <DeviceImage
+        device={device}
+        className="mb-5 aspect-[4/3]"
+        imgClassName="p-4"
+      />
+
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <span className="inline-flex rounded-xl bg-emerald-500/12 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-300">

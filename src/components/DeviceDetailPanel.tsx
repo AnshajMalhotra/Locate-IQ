@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import { Device, DeviceOption, DeviceSavePayload, getDeviceUiCategoryLabel } from '../data/mockDevices';
+import DeviceImage from './DeviceImage';
 
 interface DeviceDetailPanelProps {
   device: Device | null;
@@ -8,6 +9,7 @@ interface DeviceDetailPanelProps {
   canEditDatabase: boolean;
   protocolOptions: DeviceOption[];
   connectivityOptions: DeviceOption[];
+  applicationOptions?: string[];
   tagOptions: string[];
   saveState: 'idle' | 'saving' | 'saved' | 'failed';
   saveMessage: string | null;
@@ -36,6 +38,7 @@ function createPanelEmptyDraft(): DeviceSavePayload {
     description: '',
     vendorProductUrl: '',
     datasheetPath: '',
+    applications: [],
     tags: [],
     specs: {
       bluetoothVersion: '',
@@ -92,6 +95,7 @@ function buildDraft(device: Device, protocolOptions: DeviceOption[], connectivit
     description: device.description,
     vendorProductUrl: device.vendorProductUrl ?? '',
     datasheetPath: device.datasheetPath ?? device.documents[0]?.path ?? '',
+    applications: device.applications,
     tags: device.tags,
     specs: {
       bluetoothVersion: device.specs.bluetoothVersion ?? '',
@@ -277,6 +281,7 @@ function DeviceDetailPanel({
   canEditDatabase,
   protocolOptions,
   connectivityOptions,
+  applicationOptions = [],
   tagOptions,
   saveState,
   saveMessage,
@@ -354,7 +359,7 @@ function DeviceDetailPanel({
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-300">Device Details</p>
           <h3 className="mt-2 text-2xl font-semibold text-slate-100">{isCreating ? 'Create New Device' : currentDevice?.title}</h3>
           <p className="mt-2 text-sm text-slate-400">
-            {isCreating ? 'Add a new gateway, anchor, or beacon directly into NocoDB.' : `${currentDevice?.manufacturer}${currentDevice?.modelNumber ? ` | ${currentDevice.modelNumber}` : ''}${currentDevice?.role ? ` | ${currentDevice.role}` : ''}`}
+            {isCreating ? 'Add a new gateway, anchor, beacon, or tag directly into NocoDB.' : `${currentDevice?.manufacturer}${currentDevice?.modelNumber ? ` | ${currentDevice.modelNumber}` : ''}${currentDevice?.role ? ` | ${currentDevice.role}` : ''}`}
           </p>
         </div>
         {canEditDatabase ? (
@@ -410,6 +415,7 @@ function DeviceDetailPanel({
                 <option value="gateway">Gateway</option>
                 <option value="anchor">Anchor</option>
                 <option value="beacon">Beacon</option>
+                <option value="tag">Tag</option>
               </select>
             </label>
             <Field label="Title" value={activeDraft.title} onChange={(value) => updateDraft({ title: value })} />
@@ -488,6 +494,33 @@ function DeviceDetailPanel({
           </section>
 
           <section>
+            <h4 className="text-sm font-semibold text-slate-100">Use Cases</h4>
+            <div className="mt-3 grid gap-2 sm:grid-cols-2">
+              {applicationOptions.map((application) => {
+                const activeApplications = activeDraft.applications ?? [];
+                const active = activeApplications.includes(application);
+                return (
+                  <button
+                    key={application}
+                    type="button"
+                    onClick={() =>
+                      updateDraft({
+                        applications: active ? activeApplications.filter((entry) => entry !== application) : [...activeApplications, application],
+                      })
+                    }
+                    className={`flex items-center justify-between rounded-2xl border px-4 py-3 text-sm ${
+                      active ? 'border-emerald-500 bg-emerald-500/12 text-emerald-200' : 'border-slate-700 bg-slate-900 text-slate-300'
+                    }`}
+                  >
+                    <span>{application}</span>
+                    <span className={`h-2.5 w-2.5 rounded-full ${active ? 'bg-emerald-400' : 'bg-slate-500'}`} />
+                  </button>
+                );
+              })}
+            </div>
+          </section>
+
+          <section>
             <h4 className="text-sm font-semibold text-slate-100">Business Tags</h4>
             <div className="mt-3 grid gap-2 sm:grid-cols-2">
               {tagOptions.map((tag) => {
@@ -553,6 +586,8 @@ function DeviceDetailPanel({
 
               {activeTab === 'overview' && (
                 <div className="space-y-4">
+                  <DeviceImage device={currentDevice} className="aspect-[16/10]" imgClassName="p-6" />
+
                   {currentDevice.vendorProductUrl ? (
                     <div>
                       <a href={currentDevice.vendorProductUrl} target="_blank" rel="noreferrer" className="inline-flex items-center rounded-full border border-slate-700 px-4 py-2 text-sm font-medium text-slate-200">

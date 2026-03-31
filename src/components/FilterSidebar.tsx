@@ -9,8 +9,7 @@ interface FilterState {
   ipRatings: string[];
   edgeModes: string[];
   status: string[];
-  requirePoe: boolean;
-  requireEthernet: boolean;
+  requireEthernetPoe: boolean;
   requireWifi: boolean;
   requireCellular: boolean;
   requireGnss: boolean;
@@ -108,8 +107,7 @@ function FilterSidebar({ filters, options, onToggleMulti, onToggleBoolean, onRes
       <section className="space-y-3">
         <h4 className="text-sm font-semibold text-slate-100">Hard Requirements</h4>
         <div className="grid gap-2">
-          {renderToggle('PoE required', filters.requirePoe, () => onToggleBoolean('requirePoe'))}
-          {renderToggle('Ethernet required', filters.requireEthernet, () => onToggleBoolean('requireEthernet'))}
+          {renderToggle('Ethernet / PoE required', filters.requireEthernetPoe, () => onToggleBoolean('requireEthernetPoe'))}
           {renderToggle('Wi-Fi required', filters.requireWifi, () => onToggleBoolean('requireWifi'))}
           {renderToggle('Cellular required', filters.requireCellular, () => onToggleBoolean('requireCellular'))}
           {renderToggle('GNSS required', filters.requireGnss, () => onToggleBoolean('requireGnss'))}

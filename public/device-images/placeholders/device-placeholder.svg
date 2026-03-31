@@ -1,0 +1,26 @@
+<svg width="800" height="520" viewBox="0 0 800 520" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="520" rx="36" fill="#0F172A"/>
+  <rect x="24" y="24" width="752" height="472" rx="28" fill="#111C32" stroke="#1E293B" stroke-width="2"/>
+  <path d="M0 112H800" stroke="#1E293B" stroke-width="1"/>
+  <path d="M0 224H800" stroke="#1E293B" stroke-width="1"/>
+  <path d="M0 336H800" stroke="#1E293B" stroke-width="1"/>
+  <path d="M160 0V520" stroke="#1E293B" stroke-width="1"/>
+  <path d="M320 0V520" stroke="#1E293B" stroke-width="1"/>
+  <path d="M480 0V520" stroke="#1E293B" stroke-width="1"/>
+  <path d="M640 0V520" stroke="#1E293B" stroke-width="1"/>
+
+  <rect x="72" y="62" width="164" height="34" rx="17" fill="#16A34A" fill-opacity="0.12"/>
+  <circle cx="92" cy="79" r="6" fill="#22C55E"/>
+  <text x="110" y="84" fill="#BBF7D0" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="700" letter-spacing="2">LOCATE-IQ</text>
+
+  <rect x="88" y="142" width="624" height="236" rx="28" fill="#0B1324" stroke="#334155" stroke-width="2"/>
+  <rect x="188" y="194" width="424" height="132" rx="24" fill="#0F1A31" stroke="#475569" stroke-width="2"/>
+  <rect x="236" y="228" width="328" height="64" rx="18" fill="#111C32" stroke="#64748B" stroke-width="2"/>
+  <path d="M314 204C314 157.608 351.608 120 398 120H402C448.392 120 486 157.608 486 204V210H314V204Z" fill="#0F1A31" stroke="#64748B" stroke-width="2"/>
+  <circle cx="400" cy="260" r="20" fill="#22C55E" fill-opacity="0.15" stroke="#22C55E" stroke-width="2"/>
+  <circle cx="400" cy="260" r="8" fill="#22C55E"/>
+
+  <rect x="232" y="400" width="336" height="18" rx="9" fill="#22C55E" fill-opacity="0.16"/>
+  <text x="400" y="455" text-anchor="middle" fill="#94A3B8" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="600">Device Image Placeholder</text>
+  <text x="400" y="483" text-anchor="middle" fill="#64748B" font-family="Segoe UI, Arial, sans-serif" font-size="16">Add an image path in the DB to replace this card art.</text>
+</svg>

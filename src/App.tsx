@@ -24,8 +24,7 @@ type FilterState = {
   ipRatings: string[];
   edgeModes: string[];
   status: string[];
-  requirePoe: boolean;
-  requireEthernet: boolean;
+  requireEthernetPoe: boolean;
   requireWifi: boolean;
   requireCellular: boolean;
   requireGnss: boolean;
@@ -43,8 +42,7 @@ const defaultFilters: FilterState = {
   ipRatings: [],
   edgeModes: [],
   status: [],
-  requirePoe: false,
-  requireEthernet: false,
+  requireEthernetPoe: false,
   requireWifi: false,
   requireCellular: false,
   requireGnss: false,
@@ -249,6 +247,7 @@ function createEmptyDeviceDraft(): DeviceSavePayload {
     description: '',
     vendorProductUrl: '',
     datasheetPath: '',
+    applications: [],
     tags: [],
     specs: {
       bluetoothVersion: '',
@@ -679,6 +678,7 @@ function App() {
   const [saveState, setSaveState] = useState<SaveState>('idle');
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const [isAdvancedFilterOpen, setIsAdvancedFilterOpen] = useState(false);
+  const [applicationOptions, setApplicationOptions] = useState<string[]>(uniqueSorted(mockDevices.flatMap((device) => device.applications)));
   const [businessTagOptions, setBusinessTagOptions] = useState<string[]>(uniqueSorted(mockDevices.flatMap((device) => device.tags)));
 
   const deferredSearchQuery = useDeferredValue(searchQuery);
@@ -747,6 +747,7 @@ function App() {
       setDevices(normalizedDevices);
       setProtocolOptions(buildProtocolOptions(protocolRows));
       setConnectivityOptions(buildConnectivityOptions(connectivityRows));
+      setApplicationOptions(uniqueSorted((applicationRows as NocoRow[]).map((row: NocoRow) => getRowString(row, 'application_name')).filter(Boolean)));
       setBusinessTagOptions(uniqueSorted((tagRows as NocoRow[]).map((row: NocoRow) => getRowString(row, 'tag_name')).filter(Boolean)));
       setSelectedDeviceKey((current) => normalizedDevices.find((device) => device.key === current)?.key ?? null);
       setConnectionStatus('connected');
@@ -755,6 +756,7 @@ function App() {
       setConnectionStatus('failed');
       setConnectionError(`Failed to load linked NocoDB tables. ${message}`);
       setDevices(mockDevices);
+      setApplicationOptions(uniqueSorted(mockDevices.flatMap((device) => device.applications)));
       setBusinessTagOptions(uniqueSorted(mockDevices.flatMap((device) => device.tags)));
       setSelectedDeviceKey(null);
     }
@@ -776,8 +778,7 @@ function App() {
     if (!includesEverySelection(device.protocolNames, filters.protocols)) return false;
     if (!includesEverySelection(device.connectivity, filters.connectivity)) return false;
     if (!includesEverySelection(device.tags, filters.tags)) return false;
-    if (filters.requirePoe && !device.specs.poeSupport) return false;
-    if (filters.requireEthernet && !device.specs.ethernetSupport) return false;
+    if (filters.requireEthernetPoe && !(device.specs.ethernetSupport || device.specs.poeSupport)) return false;
     if (filters.requireWifi && !device.specs.wifiSupport) return false;
     if (filters.requireCellular && !device.specs.cellularSupport) return false;
     if (filters.requireGnss && !device.specs.gnssSupport) return false;
@@ -906,7 +907,7 @@ function App() {
 
     try {
       const normalizedBaseUrl = baseUrl.replace(/\/$/, '');
-      const [deviceRows, specRows, gatewayRows, anchorRows, protocolRows, connectivityRows, tagRows, deviceProtocolRows, deviceConnectivityRows, deviceTagRows] =
+      const [deviceRows, specRows, gatewayRows, anchorRows, protocolRows, connectivityRows, applicationRows, tagRows, deviceProtocolRows, deviceConnectivityRows, deviceApplicationRows, deviceTagRows] =
         await Promise.all([
           fetchTable(normalizedBaseUrl, apiKey, tableIds.devices),
           fetchTable(normalizedBaseUrl, apiKey, tableIds.deviceSpecs),
@@ -914,9 +915,11 @@ function App() {
           fetchTable(normalizedBaseUrl, apiKey, tableIds.anchorProfiles),
           fetchTable(normalizedBaseUrl, apiKey, tableIds.protocols),
           fetchTable(normalizedBaseUrl, apiKey, tableIds.connectivityOptions),
+          fetchTable(normalizedBaseUrl, apiKey, tableIds.applications),
           fetchTable(normalizedBaseUrl, apiKey, tableIds.businessTags),
           fetchTable(normalizedBaseUrl, apiKey, tableIds.deviceProtocols),
           fetchTable(normalizedBaseUrl, apiKey, tableIds.deviceConnectivity),
+          fetchTable(normalizedBaseUrl, apiKey, tableIds.deviceApplications),
           fetchTable(normalizedBaseUrl, apiKey, tableIds.deviceTags),
         ]);
 
@@ -1005,9 +1008,11 @@ function App() {
 
       const protocolByKey = new Map((protocolRows as NocoRow[]).map((row: NocoRow) => [getRowString(row, 'protocol_key'), row]));
       const connectivityByKey = new Map((connectivityRows as NocoRow[]).map((row: NocoRow) => [getRowString(row, 'connectivity_key'), row]));
+      const applicationByLabel = new Map((applicationRows as NocoRow[]).map((row: NocoRow) => [getRowString(row, 'application_name'), row]));
       const businessTagByLabel = new Map((tagRows as NocoRow[]).map((row: NocoRow) => [getRowString(row, 'tag_name'), row]));
       const existingProtocolRows = (deviceProtocolRows as NocoRow[]).filter((row: NocoRow) => getRowString(row, 'device_key') === device.key);
       const existingConnectivityRows = (deviceConnectivityRows as NocoRow[]).filter((row: NocoRow) => getRowString(row, 'device_key') === device.key);
+      const existingApplicationRows = (deviceApplicationRows as NocoRow[]).filter((row: NocoRow) => getRowString(row, 'device_key') === device.key);
       const existingTagRows = (deviceTagRows as NocoRow[]).filter((row: NocoRow) => getRowString(row, 'device_key') === device.key);
 
       if (existingProtocolRows.length) {
@@ -1064,6 +1069,36 @@ function App() {
 
       if (nextConnectivityRows.length) {
         await createRecords(normalizedBaseUrl, apiKey, tableIds.deviceConnectivity, nextConnectivityRows);
+      }
+
+      if (existingApplicationRows.length) {
+        await deleteRecords(
+          normalizedBaseUrl,
+          apiKey,
+          tableIds.deviceApplications,
+          existingApplicationRows.map((row: NocoRow) => ({ Id: getRowNumber(row, 'Id') })),
+        );
+      }
+
+      const nextApplicationRows: NocoRow[] = (payload.applications ?? [])
+        .filter(Boolean)
+        .flatMap((applicationLabel) => {
+          const applicationRow = applicationByLabel.get(applicationLabel);
+          if (!applicationRow) return [];
+
+          return [
+            {
+              title: `${device.key} | ${getRowString(applicationRow, 'application_key') || applicationLabel}`,
+              device_key: device.key,
+              application_key: getRowString(applicationRow, 'application_key'),
+              nc_24rw___devices_id: Number(device.id),
+              nc_24rw___applications_id: getRowNumber(applicationRow, 'Id'),
+            },
+          ];
+        });
+
+      if (nextApplicationRows.length) {
+        await createRecords(normalizedBaseUrl, apiKey, tableIds.deviceApplications, nextApplicationRows);
       }
 
       if (existingTagRows.length) {
@@ -1126,10 +1161,11 @@ function App() {
 
     try {
       const normalizedBaseUrl = baseUrl.replace(/\/$/, '');
-      const [deviceRows, protocolRows, connectivityRows, tagRows] = await Promise.all([
+      const [deviceRows, protocolRows, connectivityRows, applicationRows, tagRows] = await Promise.all([
         fetchTable(normalizedBaseUrl, apiKey, tableIds.devices),
         fetchTable(normalizedBaseUrl, apiKey, tableIds.protocols),
         fetchTable(normalizedBaseUrl, apiKey, tableIds.connectivityOptions),
+        fetchTable(normalizedBaseUrl, apiKey, tableIds.applications),
         fetchTable(normalizedBaseUrl, apiKey, tableIds.businessTags),
       ]);
 
@@ -1209,6 +1245,7 @@ function App() {
 
       const protocolByKey = new Map((protocolRows as NocoRow[]).map((row: NocoRow) => [getRowString(row, 'protocol_key'), row]));
       const connectivityByKey = new Map((connectivityRows as NocoRow[]).map((row: NocoRow) => [getRowString(row, 'connectivity_key'), row]));
+      const applicationByLabel = new Map((applicationRows as NocoRow[]).map((row: NocoRow) => [getRowString(row, 'application_name'), row]));
       const businessTagByLabel = new Map((tagRows as NocoRow[]).map((row: NocoRow) => [getRowString(row, 'tag_name'), row]));
 
       const nextProtocolRows = payload.protocols
@@ -1246,6 +1283,27 @@ function App() {
 
       if (nextConnectivityRows.length) {
         await createRecords(normalizedBaseUrl, apiKey, tableIds.deviceConnectivity, nextConnectivityRows);
+      }
+
+      const nextApplicationRows: NocoRow[] = (payload.applications ?? [])
+        .filter(Boolean)
+        .flatMap((applicationLabel) => {
+          const applicationRow = applicationByLabel.get(applicationLabel);
+          if (!applicationRow) return [];
+
+          return [
+            {
+              title: `${payload.key.trim()} | ${getRowString(applicationRow, 'application_key') || applicationLabel}`,
+              device_key: payload.key.trim(),
+              application_key: getRowString(applicationRow, 'application_key'),
+              nc_24rw___devices_id: createdDeviceId,
+              nc_24rw___applications_id: getRowNumber(applicationRow, 'Id'),
+            },
+          ];
+        });
+
+      if (nextApplicationRows.length) {
+        await createRecords(normalizedBaseUrl, apiKey, tableIds.deviceApplications, nextApplicationRows);
       }
 
       const nextTagRows: NocoRow[] = payload.tags
@@ -1380,6 +1438,7 @@ function App() {
                   canEditDatabase={canEditDatabase}
                 protocolOptions={protocolOptions}
                 connectivityOptions={connectivityOptions}
+                applicationOptions={applicationOptions}
                 tagOptions={businessTagOptions}
                 saveState={saveState}
                 saveMessage={saveMessage}
@@ -1408,6 +1467,7 @@ function App() {
               canEditDatabase={canEditDatabase}
               protocolOptions={protocolOptions}
               connectivityOptions={connectivityOptions}
+              applicationOptions={applicationOptions}
               tagOptions={businessTagOptions}
               saveState={saveState}
               saveMessage={saveMessage}

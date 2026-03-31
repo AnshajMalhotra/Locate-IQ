@@ -1,4 +1,4 @@
-export type DeviceCategory = 'gateway' | 'anchor' | 'beacon';
+export type DeviceCategory = 'gateway' | 'anchor' | 'beacon' | 'tag';
 export type DeviceUiCategory = 'gateway' | 'anchor' | 'tag' | 'beacon';
 
 export interface DeviceProtocol {
@@ -109,6 +109,7 @@ export interface Device {
   description: string;
   vendorProductUrl?: string;
   datasheetPath?: string;
+  imagePath?: string;
   applications: string[];
   tags: string[];
   connectivity: string[];
@@ -145,6 +146,7 @@ export interface DeviceSavePayload {
   description: string;
   vendorProductUrl: string;
   datasheetPath: string;
+  applications?: string[];
   tags: string[];
   specs: {
     bluetoothVersion: string;
@@ -204,6 +206,46 @@ export function getDeviceUiCategoryLabel(device: Pick<Device, 'category' | 'titl
   if (category === 'anchor') return 'Anchor';
   if (category === 'tag') return 'Tag';
   return 'Beacon';
+}
+
+function slugifyDeviceImagePart(value?: string) {
+  return (value ?? '')
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+function getDeviceImageFolder(device: Pick<Device, 'category' | 'title' | 'deviceName' | 'modelNumber' | 'subcategory' | 'role' | 'tags'>) {
+  const uiCategory = getDeviceUiCategory(device);
+
+  if (uiCategory === 'gateway') return 'gateways';
+  if (uiCategory === 'anchor') return 'anchors';
+  if (uiCategory === 'tag') return 'tags';
+  return 'beacons';
+}
+
+export function getDeviceImageCandidates(
+  device: Pick<Device, 'key' | 'title' | 'deviceName' | 'modelNumber' | 'category' | 'subcategory' | 'role' | 'tags'> & {
+    imagePath?: string;
+  },
+) {
+  const folder = getDeviceImageFolder(device);
+  const slugs = [
+    slugifyDeviceImagePart(device.key),
+    slugifyDeviceImagePart(device.title),
+    slugifyDeviceImagePart(device.deviceName),
+    slugifyDeviceImagePart(device.modelNumber),
+  ].filter(Boolean);
+
+  const generatedPaths = slugs.flatMap((slug) => [
+    `/device-images/${folder}/${slug}.png`,
+    `/device-images/${folder}/${slug}.jpg`,
+    `/device-images/${folder}/${slug}.jpeg`,
+    `/device-images/${folder}/${slug}.webp`,
+  ]);
+
+  return [...new Set([device.imagePath, ...generatedPaths, '/device-images/placeholders/device-placeholder.svg'].filter(Boolean) as string[])];
 }
 
 export const mockDevices: Device[] = [
@@ -346,7 +388,7 @@ export const mockDevices: Device[] = [
     deviceName: 'M2 Tag',
     modelNumber: 'M2',
     manufacturer: 'MOKO SMART',
-    category: 'beacon',
+    category: 'tag',
     subcategory: 'BLE RTLS asset tag',
     role: 'tag / beacon',
     status: 'active',
@@ -423,7 +465,7 @@ export const mockDevices: Device[] = [
     deviceName: 'M5 High-Temp Resistant Tag',
     modelNumber: 'M5',
     manufacturer: 'MOKO SMART',
-    category: 'beacon',
+    category: 'tag',
     subcategory: 'High-temp BLE asset tag',
     role: 'tag / beacon',
     status: 'active',
