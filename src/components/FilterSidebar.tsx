@@ -1,5 +1,6 @@
 interface FilterState {
   categories: string[];
+  technologies: string[];
   manufacturers: string[];
   applications: string[];
   protocols: string[];
@@ -18,6 +19,7 @@ interface FilterState {
 
 interface FilterOptions {
   categories: string[];
+  technologies: string[];
   manufacturers: string[];
   applications: string[];
   protocols: string[];
@@ -118,6 +120,11 @@ function FilterSidebar({ filters, options, onToggleMulti, onToggleBoolean, onRes
       <section className="space-y-3">
         <h4 className="text-sm font-semibold text-slate-100">Category</h4>
         {renderChipGroup(options.categories, filters.categories, (value) => onToggleMulti('categories', value), 'No categories loaded')}
+      </section>
+
+      <section className="space-y-3">
+        <h4 className="text-sm font-semibold text-slate-100">Technology</h4>
+        {renderChipGroup(options.technologies, filters.technologies, (value) => onToggleMulti('technologies', value), 'No technology signals loaded')}
       </section>
 
       <section className="space-y-3">

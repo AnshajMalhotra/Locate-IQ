@@ -332,7 +332,7 @@ const tableUpdates = {
       max_signal_range_real_world: OAF,
       manual_path: 'C:\\Users\\Anshaj\\Downloads\\L04-brief_250207.pdf',
     },
-    anchor_l05_usb_beacon: {
+    beacon_l05_usb_beacon: {
       bluetooth_version: 'BLE (USB BLE beacon; nRF52 series)',
       wifi_support: false,
       wifi_band: '',
@@ -363,7 +363,7 @@ const tableUpdates = {
       max_signal_range_real_world: 'Vendor publishes obstacle-free range; actual coverage depends on indoor layout and USB placement.',
       manual_path: '\\\\192.168.0.254\\file\\02_Partners\\MOKO (BLE AoA Hardware)\\L05 USB Beacon Brief_241115.pdf',
     },
-    beacon_m1p_led_tag: {
+    tag_m1p_led_tag: {
       bluetooth_version: 'BLE 5.0',
       wifi_support: false,
       wifi_band: '',
@@ -394,7 +394,7 @@ const tableUpdates = {
       max_signal_range_real_world: 'Vendor publishes obstacle-free BLE range; real-world indoor locating depends on site conditions.',
       manual_path: '\\\\192.168.0.254\\file\\02_Partners\\MOKO (BLE AoA Hardware)\\M1P LED Tag Brief_241115.pdf',
     },
-    beacon_m5_high_temp_tag: {
+    tag_m5_high_temp_tag: {
       bluetooth_version: 'BLE 5.0',
       wifi_support: false,
       wifi_band: '',
@@ -692,7 +692,7 @@ const tableUpdates = {
       installation_prerequisites: 'Install with screw-and-bracket or sticker and provision either 5200mAh Li-SOCI2 or 3200mAh alkaline replaceable battery.',
       commissioning_notes: 'Supports indoor navigation in malls, hotels, hospitals, and warehouses; commission in the customer navigation platform and consider battery chemistry against ambient temperature.',
     },
-    anchor_l05_usb_beacon: {
+    beacon_l05_usb_beacon: {
       positioning_accuracy: 'Anchor / beacon role; reviewed brief does not publish a numeric positioning accuracy value.',
       installation_height: 'Not publicly specified in reviewed brief.',
       coverage_area: 'Range-based coverage; 150m (L05I) or 250m (L05E) obstacle-free transmission.',

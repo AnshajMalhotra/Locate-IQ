@@ -109,7 +109,6 @@ export interface Device {
   description: string;
   vendorProductUrl?: string;
   datasheetPath?: string;
-  imagePath?: string;
   applications: string[];
   tags: string[];
   connectivity: string[];
@@ -146,7 +145,7 @@ export interface DeviceSavePayload {
   description: string;
   vendorProductUrl: string;
   datasheetPath: string;
-  applications?: string[];
+  applications: string[];
   tags: string[];
   specs: {
     bluetoothVersion: string;
@@ -184,10 +183,16 @@ export function getDeviceUiCategory(device: Pick<Device, 'category' | 'title' | 
     return device.category;
   }
 
-  const categoryText = [
+  const primaryIdentityText = [
     device.title,
     device.deviceName,
     device.modelNumber,
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
+
+  const secondaryIdentityText = [
     device.subcategory,
     device.role,
     ...device.tags,
@@ -196,7 +201,21 @@ export function getDeviceUiCategory(device: Pick<Device, 'category' | 'title' | 
     .join(' ')
     .toLowerCase();
 
-  return /\btag\b/.test(categoryText) ? 'tag' : 'beacon';
+  const primaryHasBeaconCue = /\bbeacon\b/.test(primaryIdentityText);
+  const primaryHasTagCue = /\btag\b/.test(primaryIdentityText);
+  const secondaryHasBeaconCue = /\bbeacon\b/.test(secondaryIdentityText);
+  const secondaryHasTagCue = /\btag\b/.test(secondaryIdentityText);
+
+  // Trust the primary naming first so explicit beacon renames in the DB
+  // aren't overridden by old "tag" wording left in subcategory/role fields.
+  if (primaryHasBeaconCue && !primaryHasTagCue) return 'beacon';
+  if (primaryHasTagCue && !primaryHasBeaconCue) return 'tag';
+  if (primaryHasBeaconCue) return 'beacon';
+  if (primaryHasTagCue) return 'tag';
+  if (secondaryHasBeaconCue && !secondaryHasTagCue) return 'beacon';
+  if (secondaryHasTagCue && !secondaryHasBeaconCue) return 'tag';
+
+  return 'beacon';
 }
 
 export function getDeviceUiCategoryLabel(device: Pick<Device, 'category' | 'title' | 'deviceName' | 'modelNumber' | 'subcategory' | 'role' | 'tags'>) {
@@ -208,44 +227,79 @@ export function getDeviceUiCategoryLabel(device: Pick<Device, 'category' | 'titl
   return 'Beacon';
 }
 
-function slugifyDeviceImagePart(value?: string) {
+function slugifyImagePart(value?: string) {
   return (value ?? '')
     .toLowerCase()
     .trim()
+    .replace(/&/g, ' and ')
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
 }
 
-function getDeviceImageFolder(device: Pick<Device, 'category' | 'title' | 'deviceName' | 'modelNumber' | 'subcategory' | 'role' | 'tags'>) {
-  const uiCategory = getDeviceUiCategory(device);
-
-  if (uiCategory === 'gateway') return 'gateways';
-  if (uiCategory === 'anchor') return 'anchors';
-  if (uiCategory === 'tag') return 'tags';
-  return 'beacons';
+function uniqStrings(values: string[]) {
+  return [...new Set(values.filter(Boolean))];
 }
 
-export function getDeviceImageCandidates(
-  device: Pick<Device, 'key' | 'title' | 'deviceName' | 'modelNumber' | 'category' | 'subcategory' | 'role' | 'tags'> & {
-    imagePath?: string;
-  },
-) {
-  const folder = getDeviceImageFolder(device);
-  const slugs = [
-    slugifyDeviceImagePart(device.key),
-    slugifyDeviceImagePart(device.title),
-    slugifyDeviceImagePart(device.deviceName),
-    slugifyDeviceImagePart(device.modelNumber),
-  ].filter(Boolean);
-
-  const generatedPaths = slugs.flatMap((slug) => [
-    `/device-images/${folder}/${slug}.png`,
-    `/device-images/${folder}/${slug}.jpg`,
-    `/device-images/${folder}/${slug}.jpeg`,
-    `/device-images/${folder}/${slug}.webp`,
+export function getDeviceImageCandidates(device: Pick<Device, 'key' | 'category' | 'title' | 'deviceName' | 'modelNumber' | 'subcategory' | 'role' | 'tags'>) {
+  const uiCategory = getDeviceUiCategory(device);
+  const folders = uniqStrings([
+    uiCategory === 'tag' ? 'tags' : `${uiCategory}s`,
+    device.category === 'beacon' ? 'beacons' : device.category === 'anchor' ? 'anchors' : device.category === 'gateway' ? 'gateways' : '',
+    uiCategory === 'tag' ? 'beacons' : '',
   ]);
 
-  return [...new Set([device.imagePath, ...generatedPaths, '/device-images/placeholders/device-placeholder.svg'].filter(Boolean) as string[])];
+  const keySlug = slugifyImagePart(device.key);
+  const keyWithoutPrefix = slugifyImagePart(device.key.replace(/^(gw|anchor|beacon|tag)_/, ''));
+  const titleSlug = slugifyImagePart(device.title);
+  const deviceNameSlug = slugifyImagePart(device.deviceName);
+  const modelSlug = slugifyImagePart(device.modelNumber);
+
+  const basenames = uniqStrings([
+    keySlug,
+    keyWithoutPrefix,
+    titleSlug,
+    deviceNameSlug,
+    modelSlug,
+    `${uiCategory}-${keyWithoutPrefix}`,
+    `${device.category}-${keyWithoutPrefix}`,
+    `${uiCategory}-${titleSlug}`,
+    `${device.category}-${titleSlug}`,
+  ]);
+
+  const extensions = ['png', 'jpg', 'jpeg', 'webp', 'svg'];
+  const candidates = [];
+  const nestedFolderNames = uniqStrings([
+    keyWithoutPrefix,
+    modelSlug,
+    titleSlug,
+    deviceNameSlug,
+    keySlug,
+  ]);
+  const nestedBasenames = uniqStrings([
+    'product',
+    'cover',
+    'device',
+    ...basenames,
+  ]);
+
+  for (const folder of folders) {
+    for (const basename of basenames) {
+      for (const extension of extensions) {
+        candidates.push(`/device-images/${folder}/${basename}.${extension}`);
+      }
+    }
+
+    for (const nestedFolder of nestedFolderNames) {
+      for (const nestedBasename of nestedBasenames) {
+        for (const extension of extensions) {
+          candidates.push(`/device-images/${folder}/${nestedFolder}/${nestedBasename}.${extension}`);
+        }
+      }
+    }
+  }
+
+  candidates.push('/device-images/placeholders/device-placeholder.svg');
+  return uniqStrings(candidates);
 }
 
 export const mockDevices: Device[] = [
@@ -383,19 +437,19 @@ export const mockDevices: Device[] = [
   },
   {
     id: 'mock-beacon-2',
-    key: 'beacon_m2_multi_variant_tag',
+    key: 'tag_m2_multi_variant_tag',
     title: 'M2 Multi-Variant Tag',
     deviceName: 'M2 Tag',
     modelNumber: 'M2',
     manufacturer: 'MOKO SMART',
     category: 'tag',
     subcategory: 'BLE RTLS asset tag',
-    role: 'tag / beacon',
+    role: 'asset tag',
     status: 'active',
     description: 'BLE tag family with multiple chipset variants that support different positioning modes, firmware tracks, and sensor combinations.',
     vendorProductUrl: 'https://www.mokosmart.com/',
     applications: ['Warehouse Tracking', 'Healthcare', 'Indoor Navigation'],
-    tags: ['beacon', 'variant-family', 'rtls'],
+    tags: ['tag', 'variant-family', 'rtls'],
     connectivity: ['BLE'],
     protocols: [{ key: 'proto_ble', name: 'BLE', direction: 'broadcast' }],
     protocolNames: ['BLE'],
@@ -460,20 +514,20 @@ export const mockDevices: Device[] = [
   },
   {
     id: 'mock-beacon-1',
-    key: 'beacon_m5_high_temp_tag',
+    key: 'tag_m5_high_temp_tag',
     title: 'M5 High-Temp Resistant Tag',
     deviceName: 'M5 High-Temp Resistant Tag',
     modelNumber: 'M5',
     manufacturer: 'MOKO SMART',
     category: 'tag',
     subcategory: 'High-temp BLE asset tag',
-    role: 'tag / beacon',
+    role: 'high-temperature asset tag',
     status: 'active',
     description: 'Industrial BLE tag built for harsh environments like steam cleaning and ultrasonic washing.',
     vendorProductUrl: 'https://www.mokosmart.com/m5-high-temp-resistant-tag/',
     datasheetPath: '\\\\192.168.0.254\\file\\02_Partners\\MOKO (BLE AoA Hardware)\\M5 High-Temp Resistant Tag Product Brief_V1.0_20230704.pdf',
     applications: ['Logistics'],
-    tags: ['beacon', 'outdoor'],
+    tags: ['tag', 'outdoor'],
     connectivity: ['BLE'],
     protocols: [{ key: 'proto_ble', name: 'BLE', direction: 'broadcast' }],
     protocolNames: ['BLE'],

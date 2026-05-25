@@ -13,13 +13,13 @@ const SENSOR_OVERRIDES = {
   gw_lw003_b: [],
   gw_mkgw3: [],
   gw_mkgw4: [],
-  beacon_m1p_led_tag: ['3-axis accelerometer', 'temperature logger (optional)'],
-  beacon_m5_high_temp_tag: ['accelerometer', 'temperature sensor', 'hall switch'],
+  tag_m1p_led_tag: ['3-axis accelerometer', 'temperature logger (optional)'],
+  tag_m5_high_temp_tag: ['accelerometer', 'temperature sensor', 'hall switch'],
   anchor_l01a: ['3-axis accelerometer', 'temperature sensor (optional)', 'humidity sensor (optional)', 'hall-effect sensor', 'barometric pressure sensor'],
   anchor_l03: ['accelerometer sensor', 'temperature sensor (optional)'],
   anchor_l04: ['accelerometer sensor (optional)', 'temperature sensor (optional)'],
-  anchor_l05_usb_beacon: [],
-  beacon_m2_multi_variant_tag: ['3-axis accelerometer', 'temperature sensor', 'humidity sensor', 'hall-effect sensor'],
+  beacon_l05_usb_beacon: [],
+  tag_m2_multi_variant_tag: ['3-axis accelerometer', 'temperature sensor', 'humidity sensor', 'hall-effect sensor'],
 };
 
 const SENSOR_NORMALIZATION = {

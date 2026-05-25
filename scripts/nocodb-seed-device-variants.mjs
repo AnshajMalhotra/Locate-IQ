@@ -7,13 +7,13 @@ const APPLY = process.argv.includes('--apply');
 
 const DEVICE = {
   title: 'M2 Multi-Variant Tag',
-  device_key: 'beacon_m2_multi_variant_tag',
+  device_key: 'tag_m2_multi_variant_tag',
   device_name: 'M2 Tag',
   manufacturer: 'MOKO SMART',
   model_number: 'M2',
-  category: 'beacon',
+  category: 'tag',
   subcategory: 'BLE RTLS asset tag',
-  role: 'tag / beacon',
+  role: 'asset tag',
   description: 'BLE tag family with multiple chipset variants that support different positioning modes, firmware tracks, and sensor combinations.',
   datasheet_path: '',
   status: 'active',
@@ -22,8 +22,8 @@ const DEVICE = {
 };
 
 const DEVICE_SPEC = {
-  title: 'beacon_m2_multi_variant_tag',
-  device_key: 'beacon_m2_multi_variant_tag',
+  title: 'tag_m2_multi_variant_tag',
+  device_key: 'tag_m2_multi_variant_tag',
   bluetooth_version: 'BLE 5.1+',
   wifi_support: false,
   wifi_band: '',
@@ -56,8 +56,8 @@ const DEVICE_SPEC = {
 
 const DEVICE_CONNECTIVITY = [
   {
-    title: 'beacon_m2_multi_variant_tag | conn_ble',
-    device_key: 'beacon_m2_multi_variant_tag',
+    title: 'tag_m2_multi_variant_tag | conn_ble',
+    device_key: 'tag_m2_multi_variant_tag',
     connectivity_key: 'conn_ble',
     details: 'BLE',
   },
@@ -65,8 +65,8 @@ const DEVICE_CONNECTIVITY = [
 
 const DEVICE_PROTOCOLS = [
   {
-    title: 'beacon_m2_multi_variant_tag | proto_ble | broadcast',
-    device_key: 'beacon_m2_multi_variant_tag',
+    title: 'tag_m2_multi_variant_tag | proto_ble | broadcast',
+    device_key: 'tag_m2_multi_variant_tag',
     protocol_key: 'proto_ble',
     direction: 'broadcast',
     details: 'BLE advertising tag family',
@@ -75,8 +75,8 @@ const DEVICE_PROTOCOLS = [
 
 const DEVICE_TAGS = [
   {
-    title: 'beacon_m2_multi_variant_tag | tag_beacon',
-    device_key: 'beacon_m2_multi_variant_tag',
+    title: 'tag_m2_multi_variant_tag | tag_beacon',
+    device_key: 'tag_m2_multi_variant_tag',
     tag_key: 'tag_beacon',
   },
 ];
@@ -85,7 +85,7 @@ const VARIANTS = [
   {
     title: 'M2 (Nordic 52810)',
     variant_key: 'm2_nordic_52810',
-    device_key: 'beacon_m2_multi_variant_tag',
+    device_key: 'tag_m2_multi_variant_tag',
     variant_label: 'M2 (Nordic 52810)',
     chipset: 'Nordic 52810',
     work_modes: 'BLE AoA\nBLE RSSI',
@@ -97,7 +97,7 @@ const VARIANTS = [
   {
     title: 'M2 (Nordic 52805)',
     variant_key: 'm2_nordic_52805',
-    device_key: 'beacon_m2_multi_variant_tag',
+    device_key: 'tag_m2_multi_variant_tag',
     variant_label: 'M2 (Nordic 52805)',
     chipset: 'Nordic 52805',
     work_modes: 'BLE AoA\nBLE RSSI',
@@ -109,7 +109,7 @@ const VARIANTS = [
   {
     title: 'M2 (Nordic 52832)',
     variant_key: 'm2_nordic_52832',
-    device_key: 'beacon_m2_multi_variant_tag',
+    device_key: 'tag_m2_multi_variant_tag',
     variant_label: 'M2 (Nordic 52832)',
     chipset: 'Nordic 52832',
     work_modes: 'BLE RSSI',
@@ -121,7 +121,7 @@ const VARIANTS = [
   {
     title: 'M2 (EFR32BG22)',
     variant_key: 'm2_efr32bg22',
-    device_key: 'beacon_m2_multi_variant_tag',
+    device_key: 'tag_m2_multi_variant_tag',
     variant_label: 'M2 (EFR32BG22)',
     chipset: 'EFR32BG22',
     work_modes: 'BLE AoA (for quuppa)',

@@ -1,0 +1,247 @@
+{
+  "generatedAt": "2026-04-27T11:40:52.211Z",
+  "mode": "apply",
+  "sourceWorkbook": "C:\\Users\\Anshaj\\Downloads\\Moko Beacons list.xlsx",
+  "sourceInventoryFiles": [
+    "C:\\Users\\Anshaj\\Downloads\\tags (2).json",
+    "C:\\Users\\Anshaj\\Documents\\RSSI_Location_Engine\\devices.json",
+    "C:\\Users\\Anshaj\\Downloads\\anchor (1).json"
+  ],
+  "validatedInventoryMatches": [
+    {
+      "source": "tags (2).json",
+      "item": "T1",
+      "mac": "FC0E55CBCC75",
+      "workbookModel": "H3",
+      "deviceKey": "tag_h3_card",
+      "status": "matched_existing"
+    },
+    {
+      "source": "tags (2).json",
+      "item": "T2",
+      "mac": "F47F5BCC9FED",
+      "workbookModel": "M2",
+      "deviceKey": "tag_m2_multi_variant_tag",
+      "status": "matched_existing"
+    },
+    {
+      "source": "tags (2).json",
+      "item": "T3",
+      "mac": "CAC90C39716B",
+      "workbookModel": "B2",
+      "deviceKey": "tag_b2_smart_badge",
+      "status": "matched_existing"
+    },
+    {
+      "source": "devices.json",
+      "item": "B1",
+      "mac": "fa9d445c7902",
+      "workbookModel": "L01",
+      "deviceKey": "anchor_l01",
+      "status": "matched_created"
+    },
+    {
+      "source": "devices.json",
+      "item": "B2",
+      "mac": "e5022a5f2b7c",
+      "workbookModel": "L01A",
+      "deviceKey": "anchor_l01a",
+      "status": "matched_existing"
+    },
+    {
+      "source": "devices.json",
+      "item": "B3",
+      "mac": "ca7995a4a2d1",
+      "workbookModel": "L01A",
+      "deviceKey": "anchor_l01a",
+      "status": "matched_existing"
+    },
+    {
+      "source": "devices.json",
+      "item": "B4",
+      "mac": "d16d0dd3da05",
+      "workbookModel": "L01",
+      "deviceKey": "anchor_l01",
+      "status": "matched_created"
+    }
+  ],
+  "aliasMappings": [
+    {
+      "workbookModel": "H3P",
+      "mapsTo": "H3 Pro",
+      "deviceKey": "tag_h3_pro_button"
+    },
+    {
+      "workbookModel": "H4P",
+      "mapsTo": "H4 Pro",
+      "deviceKey": "beacon_h4_pro_temp_humidity_sensor"
+    },
+    {
+      "workbookModel": "H5P",
+      "mapsTo": "H5 Pro",
+      "deviceKey": "tag_h5_pro_rfid_badge"
+    },
+    {
+      "workbookModel": "L03BH",
+      "mapsTo": "L03",
+      "deviceKey": "anchor_l03"
+    },
+    {
+      "workbookModel": "L04H",
+      "mapsTo": "L04",
+      "deviceKey": "anchor_l04"
+    },
+    {
+      "workbookModel": "L05E",
+      "mapsTo": "L05",
+      "deviceKey": "beacon_l05_usb_beacon"
+    },
+    {
+      "workbookModel": "M4P",
+      "mapsTo": "M4 Pro",
+      "deviceKey": "tag_m4_pro_waterproof_tag"
+    },
+    {
+      "workbookModel": "M6H",
+      "mapsTo": "M6",
+      "deviceKey": "tag_m6_industry_tag"
+    },
+    {
+      "workbookModel": "W3P",
+      "mapsTo": "W3 Pro",
+      "deviceKey": "tag_w3_pro_smart_guard_wristband"
+    }
+  ],
+  "updated": [
+    {
+      "workbookModel": "B1",
+      "aliasOf": null,
+      "deviceKey": "tag_b1_panic_button",
+      "action": "updated_specs"
+    },
+    {
+      "workbookModel": "B2",
+      "aliasOf": null,
+      "deviceKey": "tag_b2_smart_badge",
+      "action": "updated_specs"
+    },
+    {
+      "workbookModel": "B3",
+      "aliasOf": null,
+      "deviceKey": "tag_b3_emergency_button",
+      "action": "updated_specs"
+    },
+    {
+      "workbookModel": "B5",
+      "aliasOf": null,
+      "deviceKey": "tag_b5_rechargeable_badge",
+      "action": "updated_specs"
+    },
+    {
+      "workbookModel": "H1",
+      "aliasOf": null,
+      "deviceKey": "tag_h1_keychain",
+      "action": "updated_specs"
+    },
+    {
+      "workbookModel": "H3",
+      "aliasOf": null,
+      "deviceKey": "tag_h3_card",
+      "action": "updated_specs"
+    },
+    {
+      "workbookModel": "H3P",
+      "aliasOf": "H3 Pro",
+      "deviceKey": "tag_h3_pro_button",
+      "action": "updated_specs"
+    },
+    {
+      "workbookModel": "H4P",
+      "aliasOf": "H4 Pro",
+      "deviceKey": "beacon_h4_pro_temp_humidity_sensor",
+      "action": "updated_specs"
+    },
+    {
+      "workbookModel": "H5P",
+      "aliasOf": "H5 Pro",
+      "deviceKey": "tag_h5_pro_rfid_badge",
+      "action": "updated_specs"
+    },
+    {
+      "workbookModel": "L01A",
+      "aliasOf": null,
+      "deviceKey": "anchor_l01a",
+      "action": "updated_specs"
+    },
+    {
+      "workbookModel": "L03BH",
+      "aliasOf": "L03",
+      "deviceKey": "anchor_l03",
+      "action": "updated_specs"
+    },
+    {
+      "workbookModel": "L04H",
+      "aliasOf": "L04",
+      "deviceKey": "anchor_l04",
+      "action": "updated_specs"
+    },
+    {
+      "workbookModel": "L05E",
+      "aliasOf": "L05",
+      "deviceKey": "beacon_l05_usb_beacon",
+      "action": "updated_specs"
+    },
+    {
+      "workbookModel": "L02S",
+      "aliasOf": null,
+      "deviceKey": "beacon_l02s_multiple_sensor",
+      "action": "updated_specs"
+    },
+    {
+      "workbookModel": "M1P",
+      "aliasOf": null,
+      "deviceKey": "tag_m1p_led_tag",
+      "action": "updated_specs"
+    },
+    {
+      "workbookModel": "M2",
+      "aliasOf": null,
+      "deviceKey": "tag_m2_multi_variant_tag",
+      "action": "updated_specs"
+    }
+  ],
+  "created": [
+    {
+      "workbookModel": "H5",
+      "deviceKey": "tag_h5_personnel_badge",
+      "action": "updated_or_relinked"
+    },
+    {
+      "workbookModel": "H2",
+      "deviceKey": "tag_h2_navigator",
+      "action": "updated_or_relinked"
+    },
+    {
+      "workbookModel": "H6",
+      "deviceKey": "beacon_h6_light_sensor_beacon",
+      "action": "updated_or_relinked"
+    },
+    {
+      "workbookModel": "L01",
+      "deviceKey": "anchor_l01",
+      "action": "updated_or_relinked"
+    },
+    {
+      "workbookModel": "L01S",
+      "deviceKey": "anchor_l01s",
+      "action": "updated_or_relinked"
+    },
+    {
+      "workbookModel": "L02",
+      "deviceKey": "anchor_l02",
+      "action": "updated_or_relinked"
+    }
+  ],
+  "unresolvedModels": [],
+  "skipped": []
+}

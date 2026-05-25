@@ -1,0 +1,124 @@
+{
+  "generatedAt": "2026-04-27T13:32:49.444Z",
+  "mode": "apply",
+  "renames": [
+    {
+      "oldKey": "anchor_l05_usb_beacon",
+      "nextKey": "beacon_l05_usb_beacon",
+      "affected": {
+        "devices": [
+          12
+        ],
+        "device_specs": [
+          12
+        ],
+        "device_connectivity": [
+          42
+        ],
+        "device_tags": [
+          35
+        ],
+        "anchor_profiles": [
+          5
+        ]
+      }
+    },
+    {
+      "oldKey": "beacon_m1p_led_tag",
+      "nextKey": "tag_m1p_led_tag",
+      "affected": {
+        "devices": [
+          13
+        ],
+        "device_specs": [
+          13
+        ],
+        "device_connectivity": [
+          147
+        ],
+        "device_protocols": [
+          126
+        ],
+        "device_applications": [
+          135
+        ]
+      }
+    },
+    {
+      "oldKey": "beacon_m5_high_temp_tag",
+      "nextKey": "tag_m5_high_temp_tag",
+      "affected": {
+        "devices": [
+          14
+        ],
+        "device_specs": [
+          14
+        ],
+        "device_connectivity": [
+          153
+        ],
+        "device_protocols": [
+          132
+        ],
+        "device_applications": [
+          141
+        ],
+        "device_tags": [
+          111
+        ]
+      }
+    },
+    {
+      "oldKey": "beacon_m2_multi_variant_tag",
+      "nextKey": "tag_m2_multi_variant_tag",
+      "affected": {
+        "devices": [
+          16
+        ],
+        "device_specs": [
+          16
+        ],
+        "device_connectivity": [
+          148
+        ],
+        "device_protocols": [
+          127
+        ],
+        "device_applications": [
+          136
+        ],
+        "device_variants": [
+          1,
+          2,
+          3,
+          4
+        ]
+      }
+    },
+    {
+      "oldKey": "tag_h6_light_sensor_beacon",
+      "nextKey": "beacon_h6_light_sensor_beacon",
+      "affected": {
+        "devices": [
+          64
+        ],
+        "device_specs": [
+          63
+        ],
+        "device_connectivity": [
+          202
+        ],
+        "device_protocols": [
+          181
+        ],
+        "device_applications": [
+          199,
+          200
+        ],
+        "device_tags": [
+          145
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,540 @@
+Bluetooth
+Beacon
+Category
+MOKO TECHNOLOGY LTD.
+www.mokosmart.com
+
+-- 1 of 19 --
+
+Annual Capacity	Factory
+R&D Engineers
+5,000,000+	13000+ m2
+80+ IoT Products
+Designed
+200+
+Founded in 2006, MOKO Technology Ltd. is a leading
+manufacturer and provider of ODM, OEM, and IoT devices in
+China. In 2013, MOKO Technology Ltd. established the R&D
+Center and created its own IoT brand – MOKO SMART, focusing
+on IoT technology and comprehensive product lines including
+Bluetooth Low Energy, LoRaWAN, Wi-Fi, RFID, GPS, LTE, UWB
+and other wireless technology. This emphasizes MOKO's
+commitment to innovation and diverse wireless products,
+leading a path towards a connected future.
+IoT Development
+Experience
+10+ yrs.
+Empowering
+Connections
+www.mokosmart.com
+Countries and
+Regions Reached
+100+
+
+-- 2 of 19 --
+
+Device Category
+www.mokosmart.com
+Asset Tag
+M1
+Coin Tag
+M1P
+LED Tag
+M2
+Asset Tag
+M3M
+Industrial Tag
+M4
+Lite Tag
+M4 Pro
+Waterproof Tag
+M4PB
+Asset Button Tag
+M5 High-Temp
+Resistance Tag
+M6
+Industry Tag
+M7
+Anti-Tamper Tag
+M8 Compact
+Rugged Asset Tag
+M9
+Rugged Asset Tag
+N1 Stamp
+N2 Soft-foam
+Asset Tag
+UT1 Ultra-thin
+Paper Tag
+UT3 Printable
+Asset Label
+Personnel Tag & Emergency Button
+H1 Keychain
+H3 Card
+H3 Pro Button
+H5 Pro
+RFID Badge
+H5PD Dual Panic
+Button
+H7
+Helmet Tag
+H7 Lite
+Helmet Tag
+H8
+Identification Tag
+H8C
+Rechargeable Tag
+B1
+Panic Button
+B2
+Smart Badge
+B2R
+Smart Badge
+B3 Emergency
+Button
+B5 Rechargeable
+Badge
+W3B
+Essential Key-fob
+W3 Pro Smart-
+Guard Wristband
+W6/W6B
+Wristband Tag
+W7 Medical
+Wristband
+
+-- 3 of 19 --
+
+Device Category
+www.mokosmart.com
+Location Anchor Sensor Tag
+S01P PIR Presence
+S02R ToF Range Sensor
+S03D Door Sensor
+S05T Asset Temperature
+Logger
+H4 Series Temperature &
+Humidity
+Water Leakage Probe
+PT100 Temperature
+Probe
+H2 Navigator
+M3 Forte
+L01A Location Anchor
+R1 Road Stud
+L02S Multiple Sensor
+M4 Pro Temperature
+Logger
+L03 Anchor Pro
+L04 Navigation Anchor
+L05 USB Beacon
+
+-- 4 of 19 --
+
+Asset Tag
+www.mokosmart.com
+
+-- 5 of 19 --
+
+Product property M1 Coin Tag M1P LED Tag M2 Asset Tag M3M Industrial Tag M4 Lite Tag
+Physical
+Dimension (mm) Φ26.0*7.1 Φ30.0*8.0 70.0*46.0*21.0 94.6*51.7*22.8 36.5*23.5*5.2
+IP/IK Rated - - IP67 IP67/IK08 -
+Color White White Gray Gray White
+Installation 3M tape 3M tape Screw/3M tape/Zip tie Screw/Magnetic 3M tape/Zip tie
+Connectivity
+Bluetooth① BLE 5.0 BLE 5.0 BLE 5.0 BLE 5.0 BLE 5.1
+Long range feature② - Yes Optional Optional Yes
+Third-party compatibility - - Quuppa/Wirepas certified - -
+Hardware
+Sensor
+Accelerometer Yes Yes Yes Yes Yes
+Temperature - Optional Optional - Optional
+Humidity - - - - -
+Door detection - - Optional - -
+LED Red Red Red Red Red
+Power on Insulating strip Insulating strip Magnetic switch Magnetic switch / Ejector pin Insulating strip
+Battery capacity 220mAh 220mAh 1000mAh 2600mAh 220mAh
+Replaceable battery Yes Yes Yes Yes Yes
+Lifespan (default settings) 1.5 years 1.5 years 5 years 8+ years 1.5 year
+Operating temperature -20°C / +60°C -20°C / +60°C -20°C / +60°C -20°C / +60°C -20°C / +60°C
+Certification FCC|CE|RoHS|REACH FCC|CE|RoHS|REACH FCC|CE|RoHS|REACH FCC|CE|RoHS|REACH FCC|CE|RoHS|REACH
+Asset Tag
+①Compatible in hardware. ②Long range feature refer to the Coded PHY in advertisement mode. (Hereinafter the same)
+
+-- 6 of 19 --
+
+Product property M4 Pro Waterproof Tag M4PB Asset Button Tag M5 High-Temp Resistance Tag M6 Industry Tag M7 Anti-Tamper Tag
+Physical
+Dimension (mm) 42.0*26.0*6.0 43.3*26.0*6.9 64.9*32.5*13.0 97.0*53.5*28.0 53.3*33.3*5.0 (CR2032 version)
+57.3*37.3*6.8 (CR2450 version)
+IP/IK Rated IP67 IP67 IP68/IP69K/IK07 IP67/IK08 IP67
+Color White White Gray Gray White
+Installation 3M tape/Zip tie 3M tape/Zip tie Screw | Zip tie Screw | Sticker | Zip Tie
+Magnetic mounting Sticker
+Connectivity
+Bluetooth① BLE 5.1 BLE 5.0 BLE 5.1 BLE 5.1 BLE 5.0
+Long range feature Yes - - Yes -
+Third-party compatibility Quuppa certified - - Wirepas certified -
+Hardware
+Sensor
+Accelerometer Yes Yes Yes Yes Yes
+Temperature Optional - Optional Optional -
+Humidity - - - - -
+Door detection - - - - -
+LED Red Red Red | Green Red Red | Green
+Power on Insulating strip Button Magnetic switch Magnetic switch① Peeling off release paper
+Battery capacity 220mAh 220mAh 600mAh 5200mAh (Li-SOCI2)
+3200mAh (Alkaline)
+220mAh (CR2032 version)
+600mAh (CR2450 version)
+Replaceable battery Yes Yes No Yes No
+Lifespan (default settings) 1.5 years 1.5 years 3 years 10+ years (Li-SOCI2)
+5 years (Alkaline)
+1.5 years (CR2032 version)
+3 years (CR2450 version)
+Operating temperature -20°C / +60°C -20°C / +60°C -20°C / +100°C -20℃/60℃ (Li-SOCI2)
+0℃/40℃ (Alkaline) -20°C / +60°C
+Certification FCC|CE|RoHS|REACH FCC|CE|RoHS|WEEE FCC|CE|RoHS|WEEE FCC|CE|RoHS|REACH FCC|CE|RoHS|WEEE
+Asset Tag
+①Magnetic switch is not applicable for the magnetic mounting version.
+
+-- 7 of 19 --
+
+Product property M8 Compact Rugged
+Asset Tag M9 Rugged Asset Tag N1 Stamp N2
+Soft-foam Asset Tag
+UT1
+Ultra-thin Paper Tag
+UT3
+Printable Asset Tag
+Physical
+Dimension (mm) M8: 60.0*39.2*14.7
+M8A: Φ38.0*13.5
+M9: 60.0*39.2*17.2
+M9A: Φ38.0*16.0 36.5*23.5*4.7 51.0*30.5*3.0 73.3*65.0*2.3 (UT1)
+73.3*83.5*1.2 (UT1P) 160.0*100.0*1.2mm
+IP/IK Rated IP68/IP69K/IK06 IP68/IK06 - IP67 - -
+Color M8 – Black
+M8A - White
+M9 – Black
+M9A – White White White White White
+Installation Screw | Sticker Screw | Sticker 3M tape 3m tape Sticker Sticker
+Connectivity
+Bluetooth① BLE 5.0 BLE 5.0 BLE 5.1 BLE 5.1 BLE 5.1 BLE 5.1
+Long range feature - - - - - -
+Third-party compatibility - - - - - -
+Hardware
+Sensor
+Accelerometer Yes Yes - - - -
+Temperature - - Optional - - -
+Humidity - - - - - -
+Door detection - - - - - -
+LED Red Red Red - - -
+Power on Magnetic switch Magnetic switch Insulating strip Peeling off the release
+paper
+#1: Peeling off the
+release paper
+#2: NFC activation
+UHF RFID activation
+Battery capacity 600mAh 1000mAh 85mAh 85mAh 40mAh 40mAh
+Replaceable battery Yes Yes Yes No No No
+Lifespan (default settings) 3 years 5 years 17 months 14 months 3 months 3 months
+Operating temperature -20°C / +60°C -20°C / +60°C -20°C / +60°C -20°C / +60°C -20°C / +55°C -20°C / +55°C
+Certification FCC|CE|RoHS|WEEE FCC|CE|RoHS|WEEE FCC|CE|RoHS|REACH FCC|CE|RoHS|REACH FCC|CE|RoHS|REACH FCC|CE|RoHS|WEEE
+Asset Tag
+
+-- 8 of 19 --
+
+www.mokosmart.com
+Personnel Tag &
+Emergency Button
+
+-- 9 of 19 --
+
+Product property H1 Keychain H3 Card H3 Pro Button H5 Pro RFID badge H5PD
+Dual Panic Button H7 Helmet Tag H7 Lite Helmet Tag
+Physical
+Dimension (mm) 32.5*32.5*7.0 85.6*54.1*5.2 89.0*57.0*5.9 68.0*50.0*6.3 68.0*50.0*6.6 57.4*41.4*18.7 42.6*25.2*8.3
+IP rated IP65 IP66 IP66 IP66 IP65 IP67 IP67
+Color White White White (Body)
+Black (Button)
+White (Body)
+Black (Button)
+White (Body)
+Blue & Red (Button) Gray White (Body)
+Blue (Button)
+Installation Lanyard/Zip Tie Lanyard Lanyard Lanyard Lanyard 3M tape/Velcro (in
+helmet) 3M tape (in helmet)
+Connectivity
+Bluetooth① BLE 5.0 BLE 5.0 BLE 5.0 BLE 5.0 BLE 5.0 BLE 5.0 BLE 5.0
+Long range mode - Optional - Optional - - -
+Third-party compatibility - - - Wirepas certified - - -
+Hardware
+Sensor
+Accelerometer Yes Yes Yes Yes Yes Yes Yes
+RFID/NFC - Yes Yes Yes Yes Optional -
+Buzzer Optional - Yes - Yes Yes -
+Motor - - - - - - -
+LED Red Red Red | Blue | Green Red Red Red Red
+Power on Button Button Button Button Button Button Button
+Battery capacity 220mAh 800mAh 800mAh 550mAh 550mAh 550mAh 220mAh
+Replaceable battery Yes No No Yes Yes Yes No
+Lifespan (default settings) 1.5 years 5 years 5 years 3 years 3 years 3 years 1.5 years
+Operating temperature -20°C / +60°C -20°C / +60°C -20°C / +60°C -20°C / +60°C -20°C / +60°C -20°C / +60°C -20°C / +60°C
+Certification FCC|CE|RoHS|REACH FCC|CE|RoHS|REACH FCC|CE|RoHS|REACH FCC|CE|RoHS|REACH FCC|CE|RoHS|WEEE FCC|CE|RoHS|REACH FCC|CE|RoHS|REACH
+Personnel Tag
+
+-- 10 of 19 --
+
+Product property H8 Identification Tag H8C Rechargeable Tag B1 Panic Button B2 Smart Badge B2R Smart Badge B3 Emergency Button
+Physical
+Dimension (mm) 56.0*36.0*7.3 56.0*36.0*7.7 73.1*40.6*16.9 98.0*65.2*8.5 98.0*65.2*8.6 Φ48.0*15.3
+IP rated IP65 IP67 IP65 IP66 IP66 -
+Color Black Black White (Body)
+Red (Button)
+White (Body)
+Red (Button)
+White (Body)
+Red (Button) White
+Installation Lanyard Lanyard Lanyard Lanyard Lanyard 3M tape/Lanyard
+Connectivity
+Bluetooth① BLE 5.0 BLE 5.0 BLE 5.0 BLE 5.0 BLE 5.0 BLE 5.0
+Long range mode - No - - - -
+Third-party compatibility - Wirepas certified - Quuppa certified - -
+Hardware
+Sensor
+Accelerometer Yes Yes Yes Yes Yes Yes
+RFID/NFC -- No - Yes Yes -
+Buzzer Optional No Yes Yes Yes Optional
+Motor - No Yes - - -
+LED Red RGB Red/Green/Blue Red Red Red/Green/Blue
+Power on Button Button Button Button Button Button
+Battery capacity 220mAh 80mAh 500mAh 800mAh 880mAh 600mAh
+Replaceable battery Yes Rechargeable Rechargeable No yes Yes
+Lifespan (default settings) 15 months 4 months per charge 6 months per charge① 5 years 5 years 3 years
+Operating temperature -20°C / +60°C -20℃/60℃ -20°C / +60°C -20°C / +60°C -20°C / +60°C -20°C / +60°C
+Certification FCC|CE|RoHS|REACH FCC|CE|RoHS|REACH FCC|CE|RoHS|REACH FCC|CE|RoHS|REACH FCC|CE|RoHS|WEEE FCC|CE|RoHS|REACH
+Personnel Tag
+①Recommend at least charging per maximum 6 months due to the characteristics of the lithium battery.
+
+-- 11 of 19 --
+
+Product property B5 Rechargeable Badge W3B Essential Keyfob W3 Pro Smart-Guard
+Wristband W6/W6B Wristband Tag W7 Medical Wristband
+Physical
+Dimension (mm) 91.0*59.0*7.5 40.4*29.0*8.6 40.0*32.0*10.3
+Φ38.6*10.5 (W6 - Body)
+Φ38.6*10.8 (W6B - Body)
+198mm x 39.6mm (Strap)
+250*24.5*4.5 (W7 for adult)
+205*24.5*4.5 (W7 for kid)
+160*24.5*4.5 (W7 for infant)
+IP rated IP66 - IP67 IP67 IP67
+Color White (Enclosure)
+Black (Button) White White W6: Black
+W6B: Black(body), Red(button) White
+Installation Lanyard Lanyard/Strap Lanyard/Strap Lanyard/Strap Strap
+Connectivity
+Bluetooth① BLE 5.0 BLE 5.0 BLE 5.0 BLE 5.0 BLE 5.0
+Long range mode - - - - -
+Third-party compatibility Wirepas certified - - Quuppa certified -
+Hardware
+Sensor
+Accelerometer Yes Yes Yes Yes -
+RFID/NFC - - - Yes (Only W6 support) Yes
+Buzzer Yes - - - -
+Motor Yes - - - -
+LED Red/Green/Blue Red Red Red Red
+Power on Button Button Button Button NFC activation
+Battery capacity 350mAh 220mAh 220mAh 220mAh 38mAh
+Replaceable battery Rechargeable Yes No Yes No
+Lifespan (default settings) 1.5 years 1.5 years 1.5 years 5 months
+Operating temperature -20°C / +60°C -20°C / +60°C -20°C / +60°C -20°C / +60°C -25°C/55°C
+Certification FCC|CE|RoHS|REACH FCC|CE|RoHS|REACH FCC|CE|RoHS|REACH FCC|CE|RoHS|REACH FCC|CE|RoHS|REACH
+Personnel Tag
+
+-- 12 of 19 --
+
+www.mokosmart.com
+Location Anchor
+
+-- 13 of 19 --
+
+Location Anchor
+Product property H2 Navigator M3 Forte L01/L01A Location Anchor R1 Road stud
+Physical
+Dimension (mm) 48.5*48.0*14.7 122.6*72.9*33.8 76.2*53.6*24.0 (L01)
+Φ54.5*24.0 (L01A) 120.0*110.0*28.0
+IP Rated IP65 IP67 IP67 IP68
+Color White Gray White Yellow
+Installation 3M tape/Zip Tie Screw/3M tape/Zip Tie Screw/Bracket/3M tape/Magnetic
+mounting Screw/Zip Tie
+Connectivity
+Bluetooth① BLE 5.0 BLE 5.0 BLE 5.0 BLE 5.0
+Long range mode - Optional Optional -
+Third-party compatibility - Wirepas certified - -
+Hardware
+Sensor
+Accelerometer Optional Optional Optional -
+Temperature & Humidity - - Optional -
+Door detection - - Optional -
+Barometer - - Optional -
+LED Red Red Red -
+Power on Button Magnetic switch Inner button or Magnetic switch① -
+Battery Capacity 1000mAh 8000mAh 2400mAh 4000mAh
+Replaceable battery Yes Yes Yes No
+Lifespan (default settings) 5 years 10+ years 8+ years 10+ years
+Operating temperature -20°C / +60°C -20°C / +60°C -20°C / +60°C -40°C / +80°C
+Certification FCC|CE|RoHS|REACH FCC|CE|RoHS|REACH FCC|CE|RoHS|REACH FCC|CE|RoHS|REACH
+①Magnetic switch is not applicable for the magnetic mounting version.
+
+-- 14 of 19 --
+
+Location Anchor
+Product property L03 Anchor Pro L04 Navigation Anchor L05 USB Beacon
+Physical
+Dimension (mm) 74.0*74.0*24.0 73.8*46.3*26.5 43.0*24.7*11.4 (L05I)
+Φ9 *108 (External Antenna for L05E)
+IP Rated IP67 No No
+Color White White Black
+Installation Screw with bracket |Sticker Screw with bracket |Sticker Insert to USB port
+Connectivity
+Bluetooth① BLE 5.1 BLE 5.1 BLE 5.0
+Long range mode Yes Yes -
+Third-party compatibility Wirepas certified - -
+Hardware
+Sensor
+Accelerometer Optional Optional -
+Temperature & Humidity Optional Optional -
+Door detection - - -
+Barometer - - -
+LED Red/Green/Blue Red Red/Green
+Power on Button Magnetic switch Button
+Battery Capacity 10400mAh (Li-SOCI2 version)
+6400mAh (Alkaline version)
+5200mAh (Li-SOCI2 version)
+3200mAh (Alkaline version) USB power (without battery)
+Replaceable battery Yes Yes No
+Lifespan (default settings) 10+ years (Li-SOCI2)
+8 years (Alkaline)
+10+ years (Li-SOCI2)
+5 years (Alkaline) USB power
+Operating temperature -20℃/60℃ (Li-SOCI2 battery)
+0℃/40℃ (Alkaline battery)
+-20℃/60℃ (Li-SOCI2 battery)
+0℃/40℃ (Alkaline battery) -20℃/60℃
+Certification FCC|CE|RoHS|REACH FCC|CE|RoHS|REACH FCC|CE|RoHS|REACH
+
+-- 15 of 19 --
+
+Sensor Tag
+www.mokosmart.com
+
+-- 16 of 19 --
+
+Product property S01P PIR Presence S02R ToF Range Sensor S03D Door Sensor S05T Asset Temperature logger
+Physical
+Dimension (mm) 74.2*32.8*46.9 Φ38.0*14.5 77.5*27.0*24.7 (Body)
+40.0*16.0*15.0 (Magnet) 49.6*28.8*4.7
+IP Rated - IP67 IPX4 IP67
+Color White Black White White
+Installation 3M tape/Bracket 3M tape 3M tape/Bracket 3m tape
+Connectivity
+Bluetooth① BLE 5.0 BLE 5.0 BLE 5.0 BLE 5.1
+Long range mode - - - Yes
+Third-party compatibility - - - -
+Hardware
+Sensor
+Sensor type Passive IR/Door detection ToF range sensor Magnetic sensor Temperature sensor
+Sensor specifications
+Viewing angle: Horizontal 120° /
+Vertical 60°
+Detection range: 12m in Maximum
+Ranging distance: 40mm-3m
+Ranging error:
+±10mm in short range mode
+±1% in long range mode
+Detection range: 20mm Accuracy tolerance: ±0.5℃
+History storage: 60000 groups
+LED Red Red Red Red/Green
+Power on Button Magnetic switch Button Button
+Battery capacity 5200mAh 600mAh 2600mAh 220mAh
+Replaceable battery Yes Yes Yes No
+Lifespan (default settings) 5 years
+3 years – Short ranging mode (<1m)
+1 year – Long ranging mode (1m -
+3m)
+8 years 2 years
+Operating temperature -20°C / +60°C -20°C / +60°C -20°C / +60°C -30°C / +60°C
+Certification FCC|CE|RoHS|REACH FCC|CE|RoHS|REACH FCC|CE|RoHS|REACH FCC|CE|RoHS|REACH
+Condition Monitoring
+
+-- 17 of 19 --
+
+Product property H4 Series Temperature &
+Humidity Water leakage Probe PT100 Temperature Probe L02S Multiple Sensor M4 Pro Temperature
+Logger
+Physical
+Dimension (mm)
+70.0*32.2*18.2 (H4)
+88.0*32.2*18.2 (H4 Pro)
+Φ3*1000mm (Probe)
+122.6*72.9*33.8 (Body)
+1 meter length (Probe)
+122.6*72.9*33.8 (Body)
+1 meter length (Probe) 69.9*46.7*18.0 42.0*26.0*6.0
+IP Rated IPX4 IP67 IP67 IP67 IP67
+Color Black Gray Gray Gray White
+Installation 3M tape 3M tape 3M tape Screw/3M tape/Zip
+Tie/Magnetic mounting 3M tape/Zip tie
+Connectivity
+Bluetooth① BLE 5.0 BLE 5.0 BLE 5.0 BLE 5.1 BLE 5.1
+Long range mode - Optional Optional Yes Yes
+Third-party compatibility Wirepas certified - - - -
+Hardware
+Sensor
+Sensor type Temperature/Humidity sensor
+Barometer sensor (Optional) Water leakage sensor PT100 temperature sensor Temperature/Humidity/ Door
+detection Temperature
+Sensor
+specifications
+Accuracy (Typical):
+±0.5℃ / ±3% RH (H4)
+±0.3℃ / ±2% RH (H4 Pro)
+Single point detection
+Wire detection (optional)
+Accuracy tolerance: 0.5℃
+Measurement range:
+-100℃/100℃
+Resolution: 0.1℃ / 0.1% RH
+Accuracy (Typical): ±0.5℃ /
+±2% RH
+Resolution: 0.1℃
+Accuracy (Typical): ±0.5℃
+LED Red Red Red Red Red
+Power on Button Magnetic switch Magnetic switch Inner button / Magnetic switch Insulating strip
+Battery capacity 1200mAh 8000mAh 8000mAh 1000mAh 220mAh
+Replaceable battery Yes Yes Yes Yes Yes
+Lifespan (default settings) 5 years 10+ years 10+ years 5 years 1.5 years
+Operating temperature -20°C / +60°C (Body)
+-40°C / +125°C (Probe) -20°C / +60°C -20°C / +60°C (Body)
+-100℃/100℃ (Probe)
+-20°C / +60°C
+-30℃/+80℃ (Customizable)
+-20°C / +60°C
+-30℃/+80℃ (Customizable)
+Certification FCC|CE|RoHS|REACH FCC|CE|RoHS|REACH FCC|CE|RoHS|REACH FCC|CE|RoHS|REACH FCC|CE|RoHS|REACH
+Condition Monitoring
+
+-- 18 of 19 --
+
+Thank you!
+MOKO TECHNOLOGY LTD.
+Address: 4F, Building 2, Guanghui Technology Park, MinQing Rd,
+Longhua, Shenzhen, Guangdong, China
+E-mail: sales@mokosmart.com
+www.mokosmart.com
+LinkedIn O f f i c i a l W e b s i t e
+
+-- 19 of 19 --
+

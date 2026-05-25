@@ -71,39 +71,39 @@ async function createRecords(baseUrl, token, tableId, records) {
 const devices = [
   {
     title: 'L05 USB Beacon',
-    device_key: 'anchor_l05_usb_beacon',
+    device_key: 'beacon_l05_usb_beacon',
     device_name: 'L05 USB Beacon',
     manufacturer: 'MOKO SMART',
     model_number: 'L05',
-    category: 'anchor',
+    category: 'beacon',
     subcategory: 'USB BLE beacon',
-    role: 'positioning infrastructure',
+    role: 'usb beacon',
     description: 'Compact plug-and-play USB BLE beacon for indoor navigation and promotional applications; available in internal and external antenna variants.',
     datasheet_path: '\\\\192.168.0.254\\file\\02_Partners\\MOKO (BLE AoA Hardware)\\L05 USB Beacon Brief_241115.pdf',
     status: 'active',
   },
   {
     title: 'M1P LED Tag',
-    device_key: 'beacon_m1p_led_tag',
+    device_key: 'tag_m1p_led_tag',
     device_name: 'M1P LED Tag',
     manufacturer: 'MOKO SMART',
     model_number: 'M1P',
-    category: 'beacon',
+    category: 'tag',
     subcategory: 'BLE LED asset tag',
-    role: 'tag / beacon',
+    role: 'led asset tag',
     description: 'Coin-sized BLE asset tag with remotely controlled high-brightness LED for last-meter item finding in crowded indoor spaces.',
     datasheet_path: '\\\\192.168.0.254\\file\\02_Partners\\MOKO (BLE AoA Hardware)\\M1P LED Tag Brief_241115.pdf',
     status: 'active',
   },
   {
     title: 'M5 High-Temp Resistant Tag',
-    device_key: 'beacon_m5_high_temp_tag',
+    device_key: 'tag_m5_high_temp_tag',
     device_name: 'M5 High-Temp Resistant Tag',
     manufacturer: 'MOKO SMART',
     model_number: 'M5',
-    category: 'beacon',
+    category: 'tag',
     subcategory: 'High-temp BLE asset tag',
-    role: 'tag / beacon',
+    role: 'high-temperature asset tag',
     description: 'High-temperature resistant waterproof BLE asset tag designed for industrial tracking in steam cleaning, disinfection, and ultrasonic washer environments.',
     datasheet_path: '\\\\192.168.0.254\\file\\02_Partners\\MOKO (BLE AoA Hardware)\\M5 High-Temp Resistant Tag Product Brief_V1.0_20230704.pdf',
     status: 'active',
@@ -112,8 +112,8 @@ const devices = [
 
 const deviceSpecs = [
   {
-    title: 'anchor_l05_usb_beacon',
-    device_key: 'anchor_l05_usb_beacon',
+    title: 'beacon_l05_usb_beacon',
+    device_key: 'beacon_l05_usb_beacon',
     bluetooth_version: 'BLE (USB BLE beacon; nRF52 series)',
     wifi_support: false,
     wifi_band: '',
@@ -146,8 +146,8 @@ const deviceSpecs = [
     manual_path: '\\\\192.168.0.254\\file\\02_Partners\\MOKO (BLE AoA Hardware)\\L05 USB Beacon Brief_241115.pdf',
   },
   {
-    title: 'beacon_m1p_led_tag',
-    device_key: 'beacon_m1p_led_tag',
+    title: 'tag_m1p_led_tag',
+    device_key: 'tag_m1p_led_tag',
     bluetooth_version: 'BLE 5.0',
     wifi_support: false,
     wifi_band: '',
@@ -180,8 +180,8 @@ const deviceSpecs = [
     manual_path: '\\\\192.168.0.254\\file\\02_Partners\\MOKO (BLE AoA Hardware)\\M1P LED Tag Brief_241115.pdf',
   },
   {
-    title: 'beacon_m5_high_temp_tag',
-    device_key: 'beacon_m5_high_temp_tag',
+    title: 'tag_m5_high_temp_tag',
+    device_key: 'tag_m5_high_temp_tag',
     bluetooth_version: 'BLE 5.0',
     wifi_support: false,
     wifi_band: '',
@@ -217,8 +217,8 @@ const deviceSpecs = [
 
 const anchorProfiles = [
   {
-    title: 'anchor_l05_usb_beacon',
-    device_key: 'anchor_l05_usb_beacon',
+    title: 'beacon_l05_usb_beacon',
+    device_key: 'beacon_l05_usb_beacon',
     positioning_technology: 'BLE location anchor',
     positioning_accuracy: 'Anchor / beacon role; reviewed brief does not publish a numeric positioning accuracy value.',
     installation_height: 'Not publicly specified in reviewed brief.',
@@ -253,16 +253,16 @@ const businessTags = [
 ];
 
 const deviceConnectivity = [
-  { title: 'anchor_l05_usb_beacon | conn_ble', device_key: 'anchor_l05_usb_beacon', connectivity_key: 'conn_ble', details: 'USB-powered BLE broadcaster' },
-  { title: 'beacon_m1p_led_tag | conn_ble', device_key: 'beacon_m1p_led_tag', connectivity_key: 'conn_ble', details: 'Battery-powered BLE tag' },
-  { title: 'beacon_m5_high_temp_tag | conn_ble', device_key: 'beacon_m5_high_temp_tag', connectivity_key: 'conn_ble', details: 'Industrial BLE tag' },
+  { title: 'beacon_l05_usb_beacon | conn_ble', device_key: 'beacon_l05_usb_beacon', connectivity_key: 'conn_ble', details: 'USB-powered BLE broadcaster' },
+  { title: 'tag_m1p_led_tag | conn_ble', device_key: 'tag_m1p_led_tag', connectivity_key: 'conn_ble', details: 'Battery-powered BLE tag' },
+  { title: 'tag_m5_high_temp_tag | conn_ble', device_key: 'tag_m5_high_temp_tag', connectivity_key: 'conn_ble', details: 'Industrial BLE tag' },
 ];
 
 const deviceTags = [
-  { title: 'anchor_l05_usb_beacon | tag_anchor', device_key: 'anchor_l05_usb_beacon', tag_key: 'tag_anchor' },
-  { title: 'beacon_m1p_led_tag | tag_beacon', device_key: 'beacon_m1p_led_tag', tag_key: 'tag_beacon' },
-  { title: 'beacon_m5_high_temp_tag | tag_beacon', device_key: 'beacon_m5_high_temp_tag', tag_key: 'tag_beacon' },
-  { title: 'beacon_m5_high_temp_tag | tag_outdoor', device_key: 'beacon_m5_high_temp_tag', tag_key: 'tag_outdoor' },
+  { title: 'beacon_l05_usb_beacon | tag_beacon', device_key: 'beacon_l05_usb_beacon', tag_key: 'tag_beacon' },
+  { title: 'tag_m1p_led_tag | tag_beacon', device_key: 'tag_m1p_led_tag', tag_key: 'tag_beacon' },
+  { title: 'tag_m5_high_temp_tag | tag_beacon', device_key: 'tag_m5_high_temp_tag', tag_key: 'tag_beacon' },
+  { title: 'tag_m5_high_temp_tag | tag_outdoor', device_key: 'tag_m5_high_temp_tag', tag_key: 'tag_outdoor' },
 ];
 
 async function ensureRecords({ baseUrl, token, tableId, keyField, records, label }) {

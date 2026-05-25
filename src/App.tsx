@@ -1,4 +1,4 @@
-import { useCallback, useDeferredValue, useEffect, useState } from 'react';
+import { Fragment, useCallback, useDeferredValue, useEffect, useRef, useState } from 'react';
 
 import DeviceCard from './components/DeviceCard';
 import CommandBar from './components/CommandBar';
@@ -15,6 +15,7 @@ type SaveState = 'idle' | 'saving' | 'saved' | 'failed';
 
 type FilterState = {
   categories: string[];
+  technologies: string[];
   manufacturers: string[];
   applications: string[];
   protocols: string[];
@@ -33,6 +34,7 @@ type FilterState = {
 
 const defaultFilters: FilterState = {
   categories: [],
+  technologies: [],
   manufacturers: [],
   applications: [],
   protocols: [],
@@ -224,6 +226,78 @@ function getBatteryLifeLabel(device: Device) {
   return device.specs.batteryLifeEstimate?.trim() || inferBatteryLifeEstimate(device.specs) || 'Not mapped';
 }
 
+const technologyPriority = ['BLE AoA', 'BLE RSSI', 'Wirepas', 'UWB', 'LoRaWAN', 'BLE'];
+
+const explicitTechnologyMap: Record<string, string[]> = {
+  anchor_mkbal_c25_p: ['BLE AoA'],
+  tag_m1p_led_tag: ['BLE AoA', 'BLE RSSI'],
+  tag_m2_multi_variant_tag: ['BLE AoA', 'BLE RSSI', 'Wirepas'],
+  tag_m4_pro_waterproof_tag: ['BLE AoA', 'BLE RSSI'],
+  tag_m6_industry_tag: ['BLE RSSI', 'Wirepas'],
+  tag_h5_pro_rfid_badge: ['BLE RSSI', 'Wirepas'],
+  tag_b2_smart_badge: ['BLE AoA', 'BLE RSSI'],
+  tag_w6_wristband_tag: ['BLE AoA', 'BLE RSSI'],
+  beacon_h4_temp_humidity_sensor: ['BLE RSSI', 'Wirepas'],
+  beacon_h4_pro_temp_humidity_sensor: ['BLE RSSI', 'Wirepas'],
+  gw_mkgw2_lw: ['LoRaWAN'],
+  gw_lw003_b: ['LoRaWAN'],
+};
+
+function sortTechnologies(values: string[]) {
+  return [...new Set(values)].sort((left, right) => {
+    const leftIndex = technologyPriority.indexOf(left);
+    const rightIndex = technologyPriority.indexOf(right);
+
+    if (leftIndex !== -1 || rightIndex !== -1) {
+      const safeLeft = leftIndex === -1 ? Number.MAX_SAFE_INTEGER : leftIndex;
+      const safeRight = rightIndex === -1 ? Number.MAX_SAFE_INTEGER : rightIndex;
+      return safeLeft - safeRight || left.localeCompare(right);
+    }
+
+    return left.localeCompare(right);
+  });
+}
+
+function getDeviceTechnologies(device: Device) {
+  const rawSignals = [
+    ...device.protocolNames,
+    ...device.connectivity,
+    ...(device.specs.sensors ?? []),
+    device.subcategory,
+    device.role,
+    device.description,
+    device.anchorProfile?.positioningTechnology,
+    device.anchorProfile?.networkProtocols,
+    device.gatewayProfile?.notes,
+    device.variantGroup,
+    ...(device.variants ?? []).flatMap((variant) => [
+      variant.label,
+      variant.chipset,
+      ...variant.workModes,
+      ...variant.firmwareSummary,
+      ...variant.notes,
+    ]),
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
+
+  const technologies = new Set<string>(explicitTechnologyMap[device.key] ?? []);
+  const hasBle = /\bble\b|bluetooth|ibeacon|eddystone/.test(rawSignals) || Boolean(device.specs.bluetoothVersion?.trim());
+
+  if (/\baoa\b|angle of arrival|quuppa|cte/.test(rawSignals)) technologies.add('BLE AoA');
+  if (/\brssi\b/.test(rawSignals)) technologies.add('BLE RSSI');
+  if (/\buwb\b/.test(rawSignals)) technologies.add('UWB');
+  if (/\bwirepas\b/.test(rawSignals)) technologies.add('Wirepas');
+  if (/\blorawan\b/.test(rawSignals)) technologies.add('LoRaWAN');
+  if (hasBle) {
+    technologies.add('BLE');
+    technologies.add('BLE RSSI');
+  }
+
+  return sortTechnologies([...technologies]);
+}
+
 function normalizeSearchTerms(query: string) {
   const ignored = new Set(['a', 'an', 'and', 'by', 'for', 'from', 'in', 'into', 'of', 'on', 'or', 'the', 'to', 'with']);
 
@@ -338,6 +412,12 @@ function includesAnySelection(deviceValue: string | undefined, selectedValues: s
   if (!selectedValues.length) return true;
   if (!deviceValue) return false;
   return selectedValues.includes(deviceValue);
+}
+
+function matchesAnySelection(deviceValues: string[], selectedValues: string[]) {
+  if (!selectedValues.length) return true;
+  const normalized = deviceValues.map((value) => value.toLowerCase());
+  return selectedValues.some((value) => normalized.includes(value.toLowerCase()));
 }
 
 async function fetchTable(baseUrl: string, token: string, tableId: string) {
@@ -678,8 +758,8 @@ function App() {
   const [saveState, setSaveState] = useState<SaveState>('idle');
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const [isAdvancedFilterOpen, setIsAdvancedFilterOpen] = useState(false);
-  const [applicationOptions, setApplicationOptions] = useState<string[]>(uniqueSorted(mockDevices.flatMap((device) => device.applications)));
   const [businessTagOptions, setBusinessTagOptions] = useState<string[]>(uniqueSorted(mockDevices.flatMap((device) => device.tags)));
+  const detailSectionRef = useRef<HTMLElement | null>(null);
 
   const deferredSearchQuery = useDeferredValue(searchQuery);
   const baseUrl = import.meta.env.VITE_NOCODB_BASE_URL;
@@ -747,7 +827,6 @@ function App() {
       setDevices(normalizedDevices);
       setProtocolOptions(buildProtocolOptions(protocolRows));
       setConnectivityOptions(buildConnectivityOptions(connectivityRows));
-      setApplicationOptions(uniqueSorted((applicationRows as NocoRow[]).map((row: NocoRow) => getRowString(row, 'application_name')).filter(Boolean)));
       setBusinessTagOptions(uniqueSorted((tagRows as NocoRow[]).map((row: NocoRow) => getRowString(row, 'tag_name')).filter(Boolean)));
       setSelectedDeviceKey((current) => normalizedDevices.find((device) => device.key === current)?.key ?? null);
       setConnectionStatus('connected');
@@ -756,7 +835,6 @@ function App() {
       setConnectionStatus('failed');
       setConnectionError(`Failed to load linked NocoDB tables. ${message}`);
       setDevices(mockDevices);
-      setApplicationOptions(uniqueSorted(mockDevices.flatMap((device) => device.applications)));
       setBusinessTagOptions(uniqueSorted(mockDevices.flatMap((device) => device.tags)));
       setSelectedDeviceKey(null);
     }
@@ -766,9 +844,23 @@ function App() {
     void loadDataset();
   }, [loadDataset]);
 
+  useEffect(() => {
+    if (!selectedDeviceKey && !newDeviceDraft) return;
+
+    const frame = window.requestAnimationFrame(() => {
+      detailSectionRef.current?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [selectedDeviceKey, newDeviceDraft]);
+
   const filteredDevices = devices.filter((device) => {
     if (!matchesQuery(device, deferredSearchQuery)) return false;
     if (filters.categories.length && !filters.categories.includes(getDeviceUiCategoryLabel(device))) return false;
+    if (!matchesAnySelection(getDeviceTechnologies(device), filters.technologies)) return false;
     if (filters.manufacturers.length && !filters.manufacturers.includes(device.manufacturer)) return false;
     if (filters.status.length && !filters.status.includes(device.status)) return false;
     if (filters.batteryLife.length && !filters.batteryLife.includes(getBatteryLifeLabel(device))) return false;
@@ -791,6 +883,7 @@ function App() {
 
   const filterOptions = {
     categories: uniqueSorted(devices.map((device) => getDeviceUiCategoryLabel(device))),
+    technologies: sortTechnologies(devices.flatMap((device) => getDeviceTechnologies(device))),
     manufacturers: uniqueSorted(devices.map((device) => device.manufacturer)),
     applications: uniqueSorted(devices.flatMap((device) => device.applications)),
     protocols: uniqueSorted(devices.flatMap((device) => device.protocolNames)),
@@ -804,6 +897,7 @@ function App() {
 
   const selectedFilterChips = [
     ...filters.categories.map((value) => ({ key: `categories:${value}`, label: `Category: ${value}` })),
+    ...filters.technologies.map((value) => ({ key: `technologies:${value}`, label: `Technology: ${value}` })),
     ...filters.connectivity.map((value) => ({ key: `connectivity:${value}`, label: `Connectivity: ${value}` })),
     ...filters.batteryLife.map((value) => ({ key: `batteryLife:${value}`, label: `Battery: ${value}` })),
     ...filters.applications.map((value) => ({ key: `applications:${value}`, label: `Use Case: ${value}` })),
@@ -907,7 +1001,7 @@ function App() {
 
     try {
       const normalizedBaseUrl = baseUrl.replace(/\/$/, '');
-      const [deviceRows, specRows, gatewayRows, anchorRows, protocolRows, connectivityRows, applicationRows, tagRows, deviceProtocolRows, deviceConnectivityRows, deviceApplicationRows, deviceTagRows] =
+      const [deviceRows, specRows, gatewayRows, anchorRows, protocolRows, connectivityRows, tagRows, deviceProtocolRows, deviceConnectivityRows, deviceTagRows] =
         await Promise.all([
           fetchTable(normalizedBaseUrl, apiKey, tableIds.devices),
           fetchTable(normalizedBaseUrl, apiKey, tableIds.deviceSpecs),
@@ -915,11 +1009,9 @@ function App() {
           fetchTable(normalizedBaseUrl, apiKey, tableIds.anchorProfiles),
           fetchTable(normalizedBaseUrl, apiKey, tableIds.protocols),
           fetchTable(normalizedBaseUrl, apiKey, tableIds.connectivityOptions),
-          fetchTable(normalizedBaseUrl, apiKey, tableIds.applications),
           fetchTable(normalizedBaseUrl, apiKey, tableIds.businessTags),
           fetchTable(normalizedBaseUrl, apiKey, tableIds.deviceProtocols),
           fetchTable(normalizedBaseUrl, apiKey, tableIds.deviceConnectivity),
-          fetchTable(normalizedBaseUrl, apiKey, tableIds.deviceApplications),
           fetchTable(normalizedBaseUrl, apiKey, tableIds.deviceTags),
         ]);
 
@@ -1008,11 +1100,9 @@ function App() {
 
       const protocolByKey = new Map((protocolRows as NocoRow[]).map((row: NocoRow) => [getRowString(row, 'protocol_key'), row]));
       const connectivityByKey = new Map((connectivityRows as NocoRow[]).map((row: NocoRow) => [getRowString(row, 'connectivity_key'), row]));
-      const applicationByLabel = new Map((applicationRows as NocoRow[]).map((row: NocoRow) => [getRowString(row, 'application_name'), row]));
       const businessTagByLabel = new Map((tagRows as NocoRow[]).map((row: NocoRow) => [getRowString(row, 'tag_name'), row]));
       const existingProtocolRows = (deviceProtocolRows as NocoRow[]).filter((row: NocoRow) => getRowString(row, 'device_key') === device.key);
       const existingConnectivityRows = (deviceConnectivityRows as NocoRow[]).filter((row: NocoRow) => getRowString(row, 'device_key') === device.key);
-      const existingApplicationRows = (deviceApplicationRows as NocoRow[]).filter((row: NocoRow) => getRowString(row, 'device_key') === device.key);
       const existingTagRows = (deviceTagRows as NocoRow[]).filter((row: NocoRow) => getRowString(row, 'device_key') === device.key);
 
       if (existingProtocolRows.length) {
@@ -1069,36 +1159,6 @@ function App() {
 
       if (nextConnectivityRows.length) {
         await createRecords(normalizedBaseUrl, apiKey, tableIds.deviceConnectivity, nextConnectivityRows);
-      }
-
-      if (existingApplicationRows.length) {
-        await deleteRecords(
-          normalizedBaseUrl,
-          apiKey,
-          tableIds.deviceApplications,
-          existingApplicationRows.map((row: NocoRow) => ({ Id: getRowNumber(row, 'Id') })),
-        );
-      }
-
-      const nextApplicationRows: NocoRow[] = (payload.applications ?? [])
-        .filter(Boolean)
-        .flatMap((applicationLabel) => {
-          const applicationRow = applicationByLabel.get(applicationLabel);
-          if (!applicationRow) return [];
-
-          return [
-            {
-              title: `${device.key} | ${getRowString(applicationRow, 'application_key') || applicationLabel}`,
-              device_key: device.key,
-              application_key: getRowString(applicationRow, 'application_key'),
-              nc_24rw___devices_id: Number(device.id),
-              nc_24rw___applications_id: getRowNumber(applicationRow, 'Id'),
-            },
-          ];
-        });
-
-      if (nextApplicationRows.length) {
-        await createRecords(normalizedBaseUrl, apiKey, tableIds.deviceApplications, nextApplicationRows);
       }
 
       if (existingTagRows.length) {
@@ -1161,11 +1221,10 @@ function App() {
 
     try {
       const normalizedBaseUrl = baseUrl.replace(/\/$/, '');
-      const [deviceRows, protocolRows, connectivityRows, applicationRows, tagRows] = await Promise.all([
+      const [deviceRows, protocolRows, connectivityRows, tagRows] = await Promise.all([
         fetchTable(normalizedBaseUrl, apiKey, tableIds.devices),
         fetchTable(normalizedBaseUrl, apiKey, tableIds.protocols),
         fetchTable(normalizedBaseUrl, apiKey, tableIds.connectivityOptions),
-        fetchTable(normalizedBaseUrl, apiKey, tableIds.applications),
         fetchTable(normalizedBaseUrl, apiKey, tableIds.businessTags),
       ]);
 
@@ -1245,7 +1304,6 @@ function App() {
 
       const protocolByKey = new Map((protocolRows as NocoRow[]).map((row: NocoRow) => [getRowString(row, 'protocol_key'), row]));
       const connectivityByKey = new Map((connectivityRows as NocoRow[]).map((row: NocoRow) => [getRowString(row, 'connectivity_key'), row]));
-      const applicationByLabel = new Map((applicationRows as NocoRow[]).map((row: NocoRow) => [getRowString(row, 'application_name'), row]));
       const businessTagByLabel = new Map((tagRows as NocoRow[]).map((row: NocoRow) => [getRowString(row, 'tag_name'), row]));
 
       const nextProtocolRows = payload.protocols
@@ -1283,27 +1341,6 @@ function App() {
 
       if (nextConnectivityRows.length) {
         await createRecords(normalizedBaseUrl, apiKey, tableIds.deviceConnectivity, nextConnectivityRows);
-      }
-
-      const nextApplicationRows: NocoRow[] = (payload.applications ?? [])
-        .filter(Boolean)
-        .flatMap((applicationLabel) => {
-          const applicationRow = applicationByLabel.get(applicationLabel);
-          if (!applicationRow) return [];
-
-          return [
-            {
-              title: `${payload.key.trim()} | ${getRowString(applicationRow, 'application_key') || applicationLabel}`,
-              device_key: payload.key.trim(),
-              application_key: getRowString(applicationRow, 'application_key'),
-              nc_24rw___devices_id: createdDeviceId,
-              nc_24rw___applications_id: getRowNumber(applicationRow, 'Id'),
-            },
-          ];
-        });
-
-      if (nextApplicationRows.length) {
-        await createRecords(normalizedBaseUrl, apiKey, tableIds.deviceApplications, nextApplicationRows);
       }
 
       const nextTagRows: NocoRow[] = payload.tags
@@ -1377,14 +1414,17 @@ function App() {
           </div>
 
           <HardwareSearch
+            technologyOptions={filterOptions.technologies}
             connectivityOptions={filterOptions.connectivity}
             batteryOptions={filterOptions.batteryLife}
             useCaseOptions={filterOptions.applications}
             statusOptions={filterOptions.statuses}
+            selectedTechnology={filters.technologies[0] ?? ''}
             selectedConnectivity={filters.connectivity[0] ?? ''}
             selectedBattery={filters.batteryLife[0] ?? ''}
             selectedUseCase={filters.applications[0] ?? ''}
             selectedStatus={filters.status[0] ?? ''}
+            onTechnologyChange={(value) => setSingleFilter('technologies', value)}
             onConnectivityChange={(value) => setSingleFilter('connectivity', value)}
             onBatteryChange={(value) => setSingleFilter('batteryLife', value)}
             onUseCaseChange={(value) => setSingleFilter('applications', value)}
@@ -1400,19 +1440,101 @@ function App() {
             </div>
           ) : null}
 
-          <div className="mt-6 flex items-start gap-6">
-            <section
-              className={`grid flex-1 grid-cols-1 gap-5 md:grid-cols-2 ${
-                selectedDevice || newDeviceDraft ? '2xl:grid-cols-2' : '2xl:grid-cols-3'
-              }`}
-            >
-              {filteredDevices.map((device) => (
-                <DeviceCard
-                  key={device.key}
-                  device={device}
-                  isSelected={selectedDevice?.key === device.key}
-                  onSelect={(selected) => setSelectedDeviceKey(selected.key)}
+          {newDeviceDraft ? (
+            <section ref={detailSectionRef} className="mt-6 overflow-hidden rounded-[30px] border border-slate-800 bg-slate-950/80 shadow-[0_30px_80px_-40px_rgba(2,6,23,0.95)] backdrop-blur">
+              <div className="border-b border-slate-800 bg-slate-900/70 px-5 py-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
+                  Create Device
+                </p>
+              </div>
+              <div className="p-4 lg:p-5">
+                <DeviceDetailPanel
+                  key="new-device"
+                  device={null}
+                  newDeviceDraft={newDeviceDraft}
+                  canEditDatabase={canEditDatabase}
+                  protocolOptions={protocolOptions}
+                  connectivityOptions={connectivityOptions}
+                  tagOptions={businessTagOptions}
+                  saveState={saveState}
+                  saveMessage={saveMessage}
+                  onCreateDraft={startCreateDevice}
+                  onCancelCreate={cancelCreateDevice}
+                  onSave={handleSaveDeviceEdits}
+                  onCreate={handleCreateDevice}
+                  onClose={() => {
+                    setSelectedDeviceKey(null);
+                    setNewDeviceDraft(null);
+                  }}
                 />
+              </div>
+            </section>
+          ) : null}
+
+          <div className="mt-6">
+            {selectedDevice ? (
+              <section
+                ref={detailSectionRef}
+                className="mb-6 overflow-hidden rounded-[32px] border border-slate-800 bg-slate-950/90 shadow-[0_30px_80px_-40px_rgba(2,6,23,0.95)] backdrop-blur animate-in slide-in-from-top-2 fade-in duration-300"
+              >
+                <div className="flex items-center justify-between gap-3 border-b border-slate-800 bg-slate-900/70 px-5 py-3">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Focused View</p>
+                    <p className="mt-1 text-sm text-slate-300">Selected device and full details</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedDeviceKey(null);
+                      setNewDeviceDraft(null);
+                    }}
+                    className="rounded-full border border-slate-700 px-4 py-2 text-sm font-medium text-slate-300 transition hover:border-slate-600 hover:text-white"
+                  >
+                    Hide details
+                  </button>
+                </div>
+
+                <div className="grid gap-5 p-4 lg:grid-cols-[360px_minmax(0,1fr)] lg:p-5">
+                  <div className="lg:sticky lg:top-24 lg:self-start">
+                    <DeviceCard
+                      device={selectedDevice}
+                      isSelected
+                      onSelect={() => setSelectedDeviceKey(null)}
+                    />
+                  </div>
+
+                  <DeviceDetailPanel
+                    key={selectedDevice.key}
+                    device={selectedDevice}
+                    newDeviceDraft={null}
+                    canEditDatabase={canEditDatabase}
+                    protocolOptions={protocolOptions}
+                    connectivityOptions={connectivityOptions}
+                    tagOptions={businessTagOptions}
+                    saveState={saveState}
+                    saveMessage={saveMessage}
+                    onCreateDraft={startCreateDevice}
+                    onCancelCreate={cancelCreateDevice}
+                    onSave={handleSaveDeviceEdits}
+                    onCreate={handleCreateDevice}
+                    onClose={() => {
+                      setSelectedDeviceKey(null);
+                      setNewDeviceDraft(null);
+                    }}
+                  />
+                </div>
+              </section>
+            ) : null}
+
+            <section className="grid grid-cols-1 gap-5 md:grid-cols-2 2xl:grid-cols-3">
+              {filteredDevices.map((device) => (
+                <Fragment key={device.key}>
+                  <DeviceCard
+                    device={device}
+                    isSelected={selectedDevice?.key === device.key}
+                    onSelect={(selected) => setSelectedDeviceKey((current) => (current === selected.key ? null : selected.key))}
+                  />
+                </Fragment>
               ))}
 
               {!filteredDevices.length && (
@@ -1429,60 +1551,9 @@ function App() {
               )}
             </section>
 
-            {selectedDevice || newDeviceDraft ? (
-              <div className="hidden w-[420px] shrink-0 lg:block">
-                <DeviceDetailPanel
-                  key={newDeviceDraft ? 'new-device' : selectedDevice?.key ?? 'empty'}
-                  device={selectedDevice}
-                  newDeviceDraft={newDeviceDraft}
-                  canEditDatabase={canEditDatabase}
-                protocolOptions={protocolOptions}
-                connectivityOptions={connectivityOptions}
-                applicationOptions={applicationOptions}
-                tagOptions={businessTagOptions}
-                saveState={saveState}
-                saveMessage={saveMessage}
-                  onCreateDraft={startCreateDevice}
-                  onCancelCreate={cancelCreateDevice}
-                  onSave={handleSaveDeviceEdits}
-                  onCreate={handleCreateDevice}
-                  onClose={() => {
-                    setSelectedDeviceKey(null);
-                    setNewDeviceDraft(null);
-                  }}
-                />
-              </div>
-            ) : null}
           </div>
         </div>
       </main>
-
-      {(selectedDevice || newDeviceDraft) && (
-        <div className="fixed inset-0 z-40 bg-slate-950/80 backdrop-blur-sm lg:hidden">
-          <div className="ml-auto h-full w-full max-w-md border-l border-slate-700 bg-slate-900 shadow-2xl">
-            <DeviceDetailPanel
-              key={newDeviceDraft ? 'mobile-new-device' : selectedDevice?.key ?? 'mobile-empty'}
-              device={selectedDevice}
-              newDeviceDraft={newDeviceDraft}
-              canEditDatabase={canEditDatabase}
-              protocolOptions={protocolOptions}
-              connectivityOptions={connectivityOptions}
-              applicationOptions={applicationOptions}
-              tagOptions={businessTagOptions}
-              saveState={saveState}
-              saveMessage={saveMessage}
-              onCreateDraft={startCreateDevice}
-              onCancelCreate={cancelCreateDevice}
-              onSave={handleSaveDeviceEdits}
-              onCreate={handleCreateDevice}
-              onClose={() => {
-                setSelectedDeviceKey(null);
-                setNewDeviceDraft(null);
-              }}
-            />
-          </div>
-        </div>
-      )}
 
       {isAdvancedFilterOpen ? (
         <div className="fixed inset-0 z-50 flex justify-end bg-slate-950/35 backdrop-blur-sm">

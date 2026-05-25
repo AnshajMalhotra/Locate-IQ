@@ -17,10 +17,10 @@ const BATTERY_LIFE_BY_DEVICE_KEY = {
   anchor_l01a: '8+ years',
   anchor_l03: '10+ years (Li-SOCI2) / 5 years (Alkaline)',
   anchor_l04: '5+ years',
-  anchor_l05_usb_beacon: 'Infinite battery life',
-  beacon_m1p_led_tag: '9 months (default settings)',
-  beacon_m5_high_temp_tag: '3 years',
-  beacon_m2_multi_variant_tag: '3 years with motion detection',
+  beacon_l05_usb_beacon: 'Infinite battery life',
+  tag_m1p_led_tag: '9 months (default settings)',
+  tag_m5_high_temp_tag: '3 years',
+  tag_m2_multi_variant_tag: '3 years with motion detection',
 };
 
 function parseEnv(text) {

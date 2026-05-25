@@ -353,7 +353,7 @@ function DeviceDetailPanel({
     : [];
 
   return (
-    <aside className="flex max-h-[calc(100vh-3rem)] min-h-[520px] flex-col rounded-[28px] border border-slate-800 bg-slate-950/90 p-6 shadow-[0_24px_70px_-40px_rgba(2,6,23,0.95)] backdrop-blur">
+    <section className="flex w-full flex-col rounded-[28px] border border-slate-800 bg-slate-950/70 p-6">
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-300">Device Details</p>
@@ -404,7 +404,7 @@ function DeviceDetailPanel({
         </div>
       )}
 
-      <div className="mt-6 min-h-0 flex-1 overflow-y-auto pr-1">
+      <div className="mt-6 min-h-0 flex-1 pr-1">
       {isEditing ? (
         <div className="space-y-6">
           <div className="grid gap-3 sm:grid-cols-2">
@@ -752,7 +752,7 @@ function DeviceDetailPanel({
         </div>
       </section>
       ) : null}
-    </aside>
+    </section>
   );
 }
 

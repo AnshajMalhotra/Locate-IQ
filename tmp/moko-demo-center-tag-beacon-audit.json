@@ -1,0 +1,553 @@
+{
+  "source": "Moko Beacon Product Summary V3.4 (2025-12-23)",
+  "mode": "apply",
+  "countedKinds": {
+    "assetTagFamilies": 16,
+    "personnelAndEmergencyFamilies": 18,
+    "sensorTagFamiliesInPortfolio": 9,
+    "syncedSensorRows": 10,
+    "totalSyncedRows": 44
+  },
+  "products": [
+    {
+      "key": "tag_m1_coin_tag",
+      "title": "M1 Coin Tag",
+      "category": "tag",
+      "existedBefore": true,
+      "applications": [
+        "app_asset_tracking"
+      ],
+      "businessTags": [],
+      "docPath": "/docs/portfolio/Moko-Beacon-Product-Summary_V3.4_20251223.pdf"
+    },
+    {
+      "key": "tag_m1p_led_tag",
+      "title": "M1P LED Tag",
+      "category": "tag",
+      "existedBefore": true,
+      "applications": [
+        "app_asset_tracking"
+      ],
+      "businessTags": [],
+      "docPath": "/docs/tags/m1p/M1P-LED-Tag-Brief.pdf"
+    },
+    {
+      "key": "tag_m2_multi_variant_tag",
+      "title": "M2 Asset Tag",
+      "category": "tag",
+      "existedBefore": true,
+      "applications": [
+        "app_asset_tracking"
+      ],
+      "businessTags": [],
+      "docPath": "/docs/portfolio/Moko-Beacon-Product-Summary_V3.4_20251223.pdf"
+    },
+    {
+      "key": "tag_m3m_industrial_tag",
+      "title": "M3M Industrial Tag",
+      "category": "tag",
+      "existedBefore": true,
+      "applications": [
+        "app_asset_tracking"
+      ],
+      "businessTags": [
+        "outdoor"
+      ],
+      "docPath": "/docs/portfolio/Moko-Beacon-Product-Summary_V3.4_20251223.pdf"
+    },
+    {
+      "key": "tag_m4_lite_tag",
+      "title": "M4 Lite Tag",
+      "category": "tag",
+      "existedBefore": true,
+      "applications": [
+        "app_asset_tracking"
+      ],
+      "businessTags": [],
+      "docPath": "/docs/portfolio/Moko-Beacon-Product-Summary_V3.4_20251223.pdf"
+    },
+    {
+      "key": "tag_m4_pro_waterproof_tag",
+      "title": "M4 Pro Waterproof Tag",
+      "category": "tag",
+      "existedBefore": true,
+      "applications": [
+        "app_asset_tracking"
+      ],
+      "businessTags": [
+        "outdoor"
+      ],
+      "docPath": "/docs/portfolio/Moko-Beacon-Product-Summary_V3.4_20251223.pdf"
+    },
+    {
+      "key": "tag_m4pb_asset_button_tag",
+      "title": "M4PB Asset Button Tag",
+      "category": "tag",
+      "existedBefore": true,
+      "applications": [
+        "app_asset_tracking"
+      ],
+      "businessTags": [
+        "outdoor"
+      ],
+      "docPath": "/docs/portfolio/Moko-Beacon-Product-Summary_V3.4_20251223.pdf"
+    },
+    {
+      "key": "tag_m5_high_temp_tag",
+      "title": "M5 High-Temp Resistance Tag",
+      "category": "tag",
+      "existedBefore": true,
+      "applications": [
+        "app_asset_tracking"
+      ],
+      "businessTags": [
+        "outdoor"
+      ],
+      "docPath": "/docs/tags/m5/M5-High-Temp-Resistant-Tag-Brief_V1.2.pdf"
+    },
+    {
+      "key": "tag_m6_industry_tag",
+      "title": "M6 Industry Tag",
+      "category": "tag",
+      "existedBefore": true,
+      "applications": [
+        "app_asset_tracking"
+      ],
+      "businessTags": [
+        "outdoor"
+      ],
+      "docPath": "/docs/portfolio/Moko-Beacon-Product-Summary_V3.4_20251223.pdf"
+    },
+    {
+      "key": "tag_m7_anti_tamper_tag",
+      "title": "M7 Anti-Tamper Tag",
+      "category": "tag",
+      "existedBefore": true,
+      "applications": [
+        "app_asset_tracking"
+      ],
+      "businessTags": [
+        "outdoor"
+      ],
+      "docPath": "/docs/portfolio/Moko-Beacon-Product-Summary_V3.4_20251223.pdf"
+    },
+    {
+      "key": "tag_m8_compact_rugged_asset_tag",
+      "title": "M8 Compact Rugged Asset Tag",
+      "category": "tag",
+      "existedBefore": true,
+      "applications": [
+        "app_asset_tracking"
+      ],
+      "businessTags": [
+        "outdoor"
+      ],
+      "docPath": "/docs/portfolio/Moko-Beacon-Product-Summary_V3.4_20251223.pdf"
+    },
+    {
+      "key": "tag_m9_rugged_asset_tag",
+      "title": "M9 Rugged Asset Tag",
+      "category": "tag",
+      "existedBefore": true,
+      "applications": [
+        "app_asset_tracking"
+      ],
+      "businessTags": [
+        "outdoor"
+      ],
+      "docPath": "/docs/portfolio/Moko-Beacon-Product-Summary_V3.4_20251223.pdf"
+    },
+    {
+      "key": "tag_n1_stamp",
+      "title": "N1 Stamp",
+      "category": "tag",
+      "existedBefore": true,
+      "applications": [
+        "app_asset_tracking"
+      ],
+      "businessTags": [],
+      "docPath": "/docs/portfolio/Moko-Beacon-Product-Summary_V3.4_20251223.pdf"
+    },
+    {
+      "key": "tag_n2_soft_foam_asset_tag",
+      "title": "N2 Soft-foam Asset Tag",
+      "category": "tag",
+      "existedBefore": true,
+      "applications": [
+        "app_asset_tracking"
+      ],
+      "businessTags": [],
+      "docPath": "/docs/portfolio/Moko-Beacon-Product-Summary_V3.4_20251223.pdf"
+    },
+    {
+      "key": "tag_ut1_ultra_thin_paper_tag",
+      "title": "UT1 Ultra-thin Paper Tag",
+      "category": "tag",
+      "existedBefore": true,
+      "applications": [
+        "app_asset_tracking"
+      ],
+      "businessTags": [],
+      "docPath": "/docs/portfolio/Moko-Beacon-Product-Summary_V3.4_20251223.pdf"
+    },
+    {
+      "key": "tag_ut3_printable_asset_label",
+      "title": "UT3 Printable Asset Label",
+      "category": "tag",
+      "existedBefore": true,
+      "applications": [
+        "app_asset_tracking"
+      ],
+      "businessTags": [],
+      "docPath": "/docs/portfolio/Moko-Beacon-Product-Summary_V3.4_20251223.pdf"
+    },
+    {
+      "key": "tag_h1_keychain",
+      "title": "H1 Keychain",
+      "category": "tag",
+      "existedBefore": true,
+      "applications": [
+        "app_personnel_tracking"
+      ],
+      "businessTags": [],
+      "docPath": "/docs/portfolio/Moko-Beacon-Product-Summary_V3.4_20251223.pdf"
+    },
+    {
+      "key": "tag_h3_card",
+      "title": "H3 Card",
+      "category": "tag",
+      "existedBefore": true,
+      "applications": [
+        "app_personnel_tracking"
+      ],
+      "businessTags": [],
+      "docPath": "/docs/portfolio/Moko-Beacon-Product-Summary_V3.4_20251223.pdf"
+    },
+    {
+      "key": "tag_h3_pro_button",
+      "title": "H3 Pro Button",
+      "category": "tag",
+      "existedBefore": true,
+      "applications": [
+        "app_personnel_tracking"
+      ],
+      "businessTags": [],
+      "docPath": "/docs/portfolio/Moko-Beacon-Product-Summary_V3.4_20251223.pdf"
+    },
+    {
+      "key": "tag_h5_pro_rfid_badge",
+      "title": "H5 Pro RFID Badge",
+      "category": "tag",
+      "existedBefore": true,
+      "applications": [
+        "app_personnel_tracking"
+      ],
+      "businessTags": [],
+      "docPath": "/docs/portfolio/Moko-Beacon-Product-Summary_V3.4_20251223.pdf"
+    },
+    {
+      "key": "tag_h5pd_dual_panic_button",
+      "title": "H5PD Dual Panic Button",
+      "category": "tag",
+      "existedBefore": true,
+      "applications": [
+        "app_personnel_tracking"
+      ],
+      "businessTags": [],
+      "docPath": "/docs/portfolio/Moko-Beacon-Product-Summary_V3.4_20251223.pdf"
+    },
+    {
+      "key": "tag_h7_helmet_tag",
+      "title": "H7 Helmet Tag",
+      "category": "tag",
+      "existedBefore": true,
+      "applications": [
+        "app_personnel_tracking"
+      ],
+      "businessTags": [],
+      "docPath": "/docs/portfolio/Moko-Beacon-Product-Summary_V3.4_20251223.pdf"
+    },
+    {
+      "key": "tag_h7_lite_helmet_tag",
+      "title": "H7 Lite Helmet Tag",
+      "category": "tag",
+      "existedBefore": true,
+      "applications": [
+        "app_personnel_tracking"
+      ],
+      "businessTags": [],
+      "docPath": "/docs/portfolio/Moko-Beacon-Product-Summary_V3.4_20251223.pdf"
+    },
+    {
+      "key": "tag_h8_identification_tag",
+      "title": "H8 Identification Tag",
+      "category": "tag",
+      "existedBefore": true,
+      "applications": [
+        "app_personnel_tracking"
+      ],
+      "businessTags": [],
+      "docPath": "/docs/portfolio/Moko-Beacon-Product-Summary_V3.4_20251223.pdf"
+    },
+    {
+      "key": "tag_h8c_rechargeable_tag",
+      "title": "H8C Rechargeable Tag",
+      "category": "tag",
+      "existedBefore": true,
+      "applications": [
+        "app_personnel_tracking"
+      ],
+      "businessTags": [],
+      "docPath": "/docs/portfolio/Moko-Beacon-Product-Summary_V3.4_20251223.pdf"
+    },
+    {
+      "key": "tag_b1_panic_button",
+      "title": "B1 Panic Button",
+      "category": "tag",
+      "existedBefore": true,
+      "applications": [
+        "app_personnel_tracking"
+      ],
+      "businessTags": [],
+      "docPath": "/docs/portfolio/Moko-Beacon-Product-Summary_V3.4_20251223.pdf"
+    },
+    {
+      "key": "tag_b2_smart_badge",
+      "title": "B2 Smart Badge",
+      "category": "tag",
+      "existedBefore": true,
+      "applications": [
+        "app_personnel_tracking"
+      ],
+      "businessTags": [],
+      "docPath": "/docs/portfolio/Moko-Beacon-Product-Summary_V3.4_20251223.pdf"
+    },
+    {
+      "key": "tag_b2r_smart_badge",
+      "title": "B2R Smart Badge",
+      "category": "tag",
+      "existedBefore": true,
+      "applications": [
+        "app_personnel_tracking"
+      ],
+      "businessTags": [],
+      "docPath": "/docs/portfolio/Moko-Beacon-Product-Summary_V3.4_20251223.pdf"
+    },
+    {
+      "key": "tag_b3_emergency_button",
+      "title": "B3 Emergency Button",
+      "category": "tag",
+      "existedBefore": true,
+      "applications": [
+        "app_personnel_tracking"
+      ],
+      "businessTags": [],
+      "docPath": "/docs/portfolio/Moko-Beacon-Product-Summary_V3.4_20251223.pdf"
+    },
+    {
+      "key": "tag_b5_rechargeable_badge",
+      "title": "B5 Rechargeable Badge",
+      "category": "tag",
+      "existedBefore": true,
+      "applications": [
+        "app_personnel_tracking"
+      ],
+      "businessTags": [],
+      "docPath": "/docs/portfolio/Moko-Beacon-Product-Summary_V3.4_20251223.pdf"
+    },
+    {
+      "key": "tag_w3b_essential_key_fob",
+      "title": "W3B Essential Key-fob",
+      "category": "tag",
+      "existedBefore": true,
+      "applications": [
+        "app_personnel_tracking"
+      ],
+      "businessTags": [],
+      "docPath": "/docs/portfolio/Moko-Beacon-Product-Summary_V3.4_20251223.pdf"
+    },
+    {
+      "key": "tag_w3_pro_smart_guard_wristband",
+      "title": "W3 Pro Smart-Guard Wristband",
+      "category": "tag",
+      "existedBefore": true,
+      "applications": [
+        "app_personnel_tracking"
+      ],
+      "businessTags": [],
+      "docPath": "/docs/portfolio/Moko-Beacon-Product-Summary_V3.4_20251223.pdf"
+    },
+    {
+      "key": "tag_w6_wristband_tag",
+      "title": "W6/W6B Wristband Tag",
+      "category": "tag",
+      "existedBefore": true,
+      "applications": [
+        "app_personnel_tracking"
+      ],
+      "businessTags": [],
+      "docPath": "/docs/portfolio/Moko-Beacon-Product-Summary_V3.4_20251223.pdf"
+    },
+    {
+      "key": "tag_w7_medical_wristband",
+      "title": "W7 Medical Wristband",
+      "category": "tag",
+      "existedBefore": true,
+      "applications": [
+        "app_personnel_tracking"
+      ],
+      "businessTags": [],
+      "docPath": "/docs/portfolio/Moko-Beacon-Product-Summary_V3.4_20251223.pdf"
+    },
+    {
+      "key": "beacon_s01p_pir_presence_sensor",
+      "title": "S01P PIR Presence Sensor",
+      "category": "beacon",
+      "existedBefore": true,
+      "applications": [
+        "app_condition_monitoring",
+        "app_environmental_monitoring"
+      ],
+      "businessTags": [
+        "beacon",
+        "sensor"
+      ],
+      "docPath": "/docs/portfolio/Moko-Beacon-Product-Summary_V3.4_20251223.pdf"
+    },
+    {
+      "key": "beacon_s02r_tof_range_sensor",
+      "title": "S02R ToF Range Sensor",
+      "category": "beacon",
+      "existedBefore": true,
+      "applications": [
+        "app_condition_monitoring",
+        "app_environmental_monitoring"
+      ],
+      "businessTags": [
+        "beacon",
+        "sensor"
+      ],
+      "docPath": "/docs/portfolio/Moko-Beacon-Product-Summary_V3.4_20251223.pdf"
+    },
+    {
+      "key": "beacon_s03d_door_monitoring_sensor",
+      "title": "S03D Door Sensor",
+      "category": "beacon",
+      "existedBefore": true,
+      "applications": [
+        "app_condition_monitoring",
+        "app_environmental_monitoring"
+      ],
+      "businessTags": [
+        "beacon",
+        "sensor"
+      ],
+      "docPath": "/docs/beacons/S03D/S03D-Door-Sensor-Product-Brief_V2.1.pdf"
+    },
+    {
+      "key": "beacon_s05t_asset_temperature_logger",
+      "title": "S05T Asset Temperature Logger",
+      "category": "beacon",
+      "existedBefore": true,
+      "applications": [
+        "app_condition_monitoring",
+        "app_environmental_monitoring"
+      ],
+      "businessTags": [
+        "beacon",
+        "sensor"
+      ],
+      "docPath": "/docs/portfolio/Moko-Beacon-Product-Summary_V3.4_20251223.pdf"
+    },
+    {
+      "key": "beacon_h4_temp_humidity_sensor",
+      "title": "H4 Temperature & Humidity Sensor",
+      "category": "beacon",
+      "existedBefore": true,
+      "applications": [
+        "app_condition_monitoring",
+        "app_environmental_monitoring"
+      ],
+      "businessTags": [
+        "beacon",
+        "sensor"
+      ],
+      "docPath": "/docs/beacons/h4/H4-Series-Product-Brief_20250619.pdf"
+    },
+    {
+      "key": "beacon_h4_pro_temp_humidity_sensor",
+      "title": "H4 Pro Temperature & Humidity Sensor",
+      "category": "beacon",
+      "existedBefore": true,
+      "applications": [
+        "app_condition_monitoring",
+        "app_environmental_monitoring"
+      ],
+      "businessTags": [
+        "beacon",
+        "sensor"
+      ],
+      "docPath": "/docs/beacons/h4/H4-Series-Product-Brief_20250619.pdf"
+    },
+    {
+      "key": "beacon_water_leakage_probe",
+      "title": "Water Leakage Probe",
+      "category": "beacon",
+      "existedBefore": true,
+      "applications": [
+        "app_condition_monitoring",
+        "app_environmental_monitoring"
+      ],
+      "businessTags": [
+        "beacon",
+        "sensor"
+      ],
+      "docPath": "/docs/portfolio/Moko-Beacon-Product-Summary_V3.4_20251223.pdf"
+    },
+    {
+      "key": "beacon_pt100_temperature_probe",
+      "title": "PT100 Temperature Probe",
+      "category": "beacon",
+      "existedBefore": true,
+      "applications": [
+        "app_condition_monitoring",
+        "app_environmental_monitoring"
+      ],
+      "businessTags": [
+        "beacon",
+        "sensor"
+      ],
+      "docPath": "/docs/portfolio/Moko-Beacon-Product-Summary_V3.4_20251223.pdf"
+    },
+    {
+      "key": "beacon_l02s_multiple_sensor",
+      "title": "L02S Multiple Sensor",
+      "category": "beacon",
+      "existedBefore": true,
+      "applications": [
+        "app_condition_monitoring",
+        "app_environmental_monitoring"
+      ],
+      "businessTags": [
+        "beacon",
+        "sensor"
+      ],
+      "docPath": "/docs/portfolio/Moko-Beacon-Product-Summary_V3.4_20251223.pdf"
+    },
+    {
+      "key": "beacon_m4_pro_temperature_logger",
+      "title": "M4 Pro Temperature Logger",
+      "category": "beacon",
+      "existedBefore": true,
+      "applications": [
+        "app_condition_monitoring",
+        "app_environmental_monitoring"
+      ],
+      "businessTags": [
+        "beacon",
+        "sensor"
+      ],
+      "docPath": "/docs/portfolio/Moko-Beacon-Product-Summary_V3.4_20251223.pdf"
+    }
+  ]
+}

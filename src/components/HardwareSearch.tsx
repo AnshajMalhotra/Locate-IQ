@@ -1,12 +1,15 @@
 interface HardwareSearchProps {
+  technologyOptions: string[];
   connectivityOptions: string[];
   batteryOptions: string[];
   useCaseOptions: string[];
   statusOptions: string[];
+  selectedTechnology: string;
   selectedConnectivity: string;
   selectedBattery: string;
   selectedUseCase: string;
   selectedStatus: string;
+  onTechnologyChange: (value: string) => void;
   onConnectivityChange: (value: string) => void;
   onBatteryChange: (value: string) => void;
   onUseCaseChange: (value: string) => void;
@@ -54,14 +57,17 @@ function FilterDropdown({
 }
 
 function HardwareSearch({
+  technologyOptions,
   connectivityOptions,
   batteryOptions,
   useCaseOptions,
   statusOptions,
+  selectedTechnology,
   selectedConnectivity,
   selectedBattery,
   selectedUseCase,
   selectedStatus,
+  onTechnologyChange,
   onConnectivityChange,
   onBatteryChange,
   onUseCaseChange,
@@ -73,6 +79,7 @@ function HardwareSearch({
   return (
     <section className="rounded-xl border border-slate-700/60 bg-slate-800/50 p-4 backdrop-blur-sm">
       <div className="flex flex-wrap gap-4">
+        <FilterDropdown label="Technology" value={selectedTechnology} onChange={onTechnologyChange} options={technologyOptions} />
         <FilterDropdown label="Connectivity" value={selectedConnectivity} onChange={onConnectivityChange} options={connectivityOptions} />
         <FilterDropdown label="Battery" value={selectedBattery} onChange={onBatteryChange} options={batteryOptions} />
         <FilterDropdown label="Use Case" value={selectedUseCase} onChange={onUseCaseChange} options={useCaseOptions} />
