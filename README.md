@@ -2,6 +2,13 @@
 
 A responsive internal web app for browsing hardware devices like gateways and anchors.
 
+## Handover
+
+If this project is being transferred to a new owner, start with:
+
+- [`docs/locate-iq-handover.md`](/c:/Users/Anshaj/Desktop/Locate-IQ/docs/locate-iq-handover.md)
+- [`.env.example`](/c:/Users/Anshaj/Desktop/Locate-IQ/.env.example)
+
 ## Features
 
 - Catalog view with search and filters
